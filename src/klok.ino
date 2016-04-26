@@ -1,8 +1,3 @@
-#include <Wire.h>
-#include <DS3231.h>
-
-// Init the DS3231 using the hardware interface
-DS3231  rtc(A4, A5);
 
 void klok_init()
 {
