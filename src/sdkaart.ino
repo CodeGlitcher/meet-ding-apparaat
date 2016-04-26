@@ -2,10 +2,10 @@
 /**
 * This file contains logic for data storage
 */
-void setupSdkaart(){
+void opslag_init(){
 
 }
 
-void loopSdkaart(){
-
+void opslag_loop(){
+  
 }
