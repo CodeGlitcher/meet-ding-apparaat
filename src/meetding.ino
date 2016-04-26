@@ -1,12 +1,18 @@
+
+/**
+* main file
+*/
 #include "printf.h";
-int serialPort = 115200;
+long serialPort = 115200;
 
 void setup(){
+  Serial.begin(serialPort);
+  printf_begin();
   setupSdkaart();
+  klok_init();
 }
 
 void loop(){
-  Serial.begin(serialPort);
-  printf_begin();
 
+  klok_loop();
 }
