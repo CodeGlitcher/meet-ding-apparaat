@@ -14,7 +14,7 @@ void knoppen_init(int selecteer, int pot)
   knoppen_selecteer_pin = selecteer;
   knoppen_potmeter_pin = pot;
 
-  attachInterrupt(0, knop_selecteer, FALLING);
+  attachInterrupt(selecteer, knop_selecteer, FALLING);
 }
 
 void knoppen_set_selecteer_callback(void(*f)(void))
@@ -45,7 +45,7 @@ void knop_selecteer()
 
 void knoppen_loop()
 {
-  if (millis() - knoppen_laatste_loop > 10){
+  if (millis() - knoppen_laatste_loop > 50){
     knoppen_laatste_loop = millis();
 
     int huidige_waarde = knoppen_potmeter_waarde();
