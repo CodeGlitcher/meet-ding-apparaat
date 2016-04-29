@@ -1,10 +1,10 @@
-const long baud = 115200;
+const long baud = 57600;
 
 // Initieer alle componenten
 void setup(){
   log_init(baud);
   opslag_init();
-  knoppen_init(0,4);
+  knoppen_init(2,4);
 
   log_print("Alle componenten zijn geïnitialiseerd ");
 }
