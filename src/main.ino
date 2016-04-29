@@ -1,18 +1,26 @@
 #include "printf.h"
-long serialPort = 115200;
+const long baud = 115200;
 
 void setup()  {
-  Serial.begin(serialPort);
-  // printf_begin();
+  log_init(baud);
+
+  opslag_init();
+  knoppen_init(0,4);
 
   setupSdkaart();
-  setupTempSensor(serialPort);
+  setupTempSensor(baud);
+
+  log_print("Alle componenten zijn geïnitialiseerd ");
 }
 
 void loop() {
   loopTempSensor();
 
+  opslag_loop();
+  knoppen_loop();
+
   Serial.print("Celcius: ");
   Serial.print(getCelcius());
   Serial.println(" ");
+
 }
