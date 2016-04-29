@@ -1,15 +1,20 @@
-const long baud = 115200;
 
-// Initieer alle componenten
+/**
+* main file
+*/
+#include "printf.h";
+#include <DS3231.h>
+long serialPort = 115200;
+DS3231 rtc(A4, A5);
+
 void setup(){
-  log_init(baud);
+  Serial.begin(serialPort);
+  printf_begin();
   opslag_init();
-  knoppen_init(0,4);
-
-  log_print("Alle componenten zijn geïnitialiseerd ");
+  klok_init();
 }
 
 void loop(){
-  opslag_loop();
-  knoppen_loop();
+opslag_loop();
+  klok_loop();
 }
