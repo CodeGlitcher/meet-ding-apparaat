@@ -10,25 +10,32 @@ DHT dht(DHTPIN, DHTTYPE);
 //temp values
 float humidity, celcius, fahrenheit = 0.0;
 
-//interval in millis
-bool do_interval = true;
-unsigned long prev_millis = 0;
-const long interval = 500;
+long prev_millis = 0;
 
-void setupTempSensor(long port)  {
-  Serial.begin(port);
-  Serial.println("DHT11 setup");
+void setupTempSensor()  {
+  Serial.begin(115200);
   dht.begin();
 }
 
 void loopTempSensor() {
-  if(do_interval) {
-    unsigned long curr_millis = millis();
-    if(curr_millis - prev_millis >= interval) {
-      prev_millis = curr_millis;
-      readDHTValues();
-    }
-  }
+   if(millis() - prev_millis >= 1000) {
+     prev_millis = millis();
+     readDHTValues();
+  
+     log_enable();
+  
+     char str[100];
+     int d1 = celcius;            // Get the integer part (678).
+     float f2 = celcius - d1;     // Get fractional part (0.01234567).
+     int d2 = trunc(f2 * 10000);   // Turn into integer (123).
+     float f3 = f2 * 10000 - d2;   // Get next fractional part (0.4567).
+     int d3 = trunc(f3 * 10000);   // Turn into integer (4567).
+  
+     sprintf (str, "Celcius: %d.%04d%04d\n", d1, d2, d3);
+  
+     log_println(str);
+     log_disable();
+   }
 }
 
 void readDHTValues() {

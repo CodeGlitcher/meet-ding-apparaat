@@ -7,20 +7,13 @@ void setup()  {
   opslag_init();
   knoppen_init(0,4);
 
-  setupSdkaart();
-  setupTempSensor(baud);
+  setupTempSensor();
 
   log_print("Alle componenten zijn geïnitialiseerd ");
 }
 
 void loop() {
   loopTempSensor();
-
   opslag_loop();
   knoppen_loop();
-
-  Serial.print("Celcius: ");
-  Serial.print(getCelcius());
-  Serial.println(" ");
-
 }
