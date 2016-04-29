@@ -7,13 +7,13 @@ void setup()  {
   opslag_init();
   knoppen_init(0,4);
 
-  setupTempSensor();
+  sensor_temp_init();
 
   log_print("Alle componenten zijn geïnitialiseerd ");
 }
 
 void loop() {
-  loopTempSensor();
+  sensor_temp_loop();
   opslag_loop();
   knoppen_loop();
 }

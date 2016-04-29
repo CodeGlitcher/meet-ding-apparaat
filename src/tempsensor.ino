@@ -12,15 +12,15 @@ float humidity, celcius, fahrenheit = 0.0;
 
 long prev_millis = 0;
 
-void setupTempSensor()  {
+void sensor_temp_init()  {
   Serial.begin(115200);
   dht.begin();
 }
 
-void loopTempSensor() {
+void sensor_temp_loop() {
    if(millis() - prev_millis >= 1000) {
      prev_millis = millis();
-     readDHTValues();
+     sensor_temp_read_values();
   
      log_enable();
   
@@ -38,31 +38,30 @@ void loopTempSensor() {
    }
 }
 
-void readDHTValues() {
-  //Read values
+void sensor_temp_read_values() {
   humidity = dht.readHumidity();
   celcius = dht.readTemperature();
   fahrenheit = dht.readTemperature(true);
 }
 
-float getHumidity() {
+float sensor_temp_humidity() {
   return humidity;
 }
 
-float getCelcius() {
+float sensor_temp_celcius() {
   return celcius;
 }
 
-float getFahrenheit() {
+float sensor_temp_fahrenheit() {
   return fahrenheit;
 }
 
 //Gevoelens tempratuur in celcius
-float getHeatIndexC() {
+float sensor_temp_heatindex_c() {
   return dht.computeHeatIndex(celcius, humidity);
 }
 
 //Fahrenheit == false
-float getHeatIndexF() {
+float sensor_temp_heatindex_f() {
   return dht.computeHeatIndex(fahrenheit, humidity, false);
 }
