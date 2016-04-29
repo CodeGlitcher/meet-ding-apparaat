@@ -4,6 +4,9 @@
 */
 #include "printf.h";
 #include <DS3231.h>
+#include <SPI.h>
+#include <SD.h>
+
 long serialPort = 115200;
 DS3231 rtc(A4, A5);
 
