@@ -35,7 +35,12 @@ void knop_selecteer()
   knoppen_laatst_gedrukt = millis();
   
   log_println("Knop ingedrukt");
-  knoppen_select_func();
+
+  if (knoppen_select_func){
+    knoppen_select_func();
+  } else {
+    log_println("Geen knop callback");
+  }
 }
 
 void knoppen_loop()
@@ -50,7 +55,12 @@ void knoppen_loop()
       char buffer[50];
       sprintf(buffer, "Potmeter waarde is: %d", huidige_waarde);
       log_println(buffer);
-      knoppen_pot_func(huidige_waarde);
+
+      if (knoppen_pot_func){
+        knoppen_pot_func(huidige_waarde);
+      } else {
+        log_println("Geen potmeter callback");
+      }
     }
   }
 }
