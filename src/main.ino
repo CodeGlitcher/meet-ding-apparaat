@@ -1,13 +1,18 @@
-#include "printf.h";
-int serialPort = 115200;
+#include "printf.h"
+long serialPort = 115200;
 
-void setup(){
+void setup()  {
+  Serial.begin(serialPort);
+  // printf_begin();
+
   setupSdkaart();
-  setupTempSensor();
+  setupTempSensor(serialPort);
 }
 
-void loop(){
-  // Serial.begin(serialPort);
-  // printf_begin();
+void loop() {
   loopTempSensor();
+
+  Serial.print("Celcius: ");
+  Serial.print(getCelcius());
+  Serial.println(" ");
 }
