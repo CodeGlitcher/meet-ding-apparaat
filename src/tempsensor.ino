@@ -7,7 +7,13 @@
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 
+//temp values
 float humidity, celcius, fahrenheit = 0.0;
+
+//interval in millis
+bool do_interval = true;
+unsigned long prev_millis = 0;
+const long interval = 500;
 
 void setupTempSensor(long port)  {
   Serial.begin(port);
@@ -16,14 +22,20 @@ void setupTempSensor(long port)  {
 }
 
 void loopTempSensor() {
+  if(do_interval) {
+    unsigned long curr_millis = millis();
+    if(curr_millis - prev_millis >= interval) {
+      prev_millis = curr_millis;
+      readDHTValues();
+    }
+  }
+}
 
+void readDHTValues() {
   //Read values
   humidity = dht.readHumidity();
   celcius = dht.readTemperature();
   fahrenheit = dht.readTemperature(true);
-
-  //test delay
-  delay(1000);
 }
 
 float getHumidity() {
