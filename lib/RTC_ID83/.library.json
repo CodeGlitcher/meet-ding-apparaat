@@ -1,0 +1,28 @@
+{
+    "name": "RTC", 
+    "repository": {
+        "url": "https://github.com/adafruit/RTClib.git", 
+        "type": "git"
+    }, 
+    "platforms": [
+        "atmelavr"
+    ], 
+    "frameworks": [
+        "arduino"
+    ], 
+    "version": "84dd2103f2", 
+    "authors": [
+        {
+            "maintainer": false, 
+            "name": "Adafruit Industries", 
+            "url": "https://github.com/adafruit", 
+            "email": null
+        }
+    ], 
+    "keywords": [
+        "time", 
+        "rtc"
+    ], 
+    "id": 83, 
+    "description": "Real time clock (RTC) that allows your microcontroller project to keep track of time even if it is reprogrammed, or if the power is lost (DS1307)"
+}

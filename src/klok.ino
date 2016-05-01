@@ -1,7 +1,12 @@
+RTC_DS3231 rtc;
 
 void klok_init()
 {
-  rtc.begin();
+
+  if (! rtc.begin()) {
+    log_println("Klok niet gevonden");
+
+  }
   // use the following commands to set date and time
   // rtc.setDOW(TUESDAY);     // Set Day-of-Week to SUNDAY
   // rtc.setTime(10, 52, 0);     // Set the time to 12:00:00 (24hr format)
@@ -17,16 +22,25 @@ void klok_loop()
 * 26-4-2016 -- 12:00
 */
 String klok_getDateTime(){
-  String out = rtc.getDateStr();
-  out += " -- ";
-  out += rtc.getTimeStr();
+  DateTime now = rtc.now();
+  String out = "";
+  out +=now.day() ;
+  out+= "-";
+  out+= now.month();
+  out+= "-";
+  out+= now.year();
+  out+= " -- " ;
+  out+= now.hour();
+  out+= ":";
+  out+= now.minute();
   // Send date
-  return out;
+  return "";
 
 }
 /**
 * Get unix time stemp
 */
 long klok_getUnitxTime(){
-  return rtc.getUnixTime(rtc.getTime());
+  DateTime now = rtc.now();
+  return now.unixtime();
 }

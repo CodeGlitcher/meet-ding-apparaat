@@ -3,18 +3,22 @@
 * main file
 */
 #include "printf.h";
-#include <DS3231.h>
-long serialPort = 115200;
-DS3231 rtc(A4, A5);
+#include "RTClib.h";
+#include "Wire.h";
+const long baud = 115200;
+
+
 
 void setup(){
-  Serial.begin(serialPort);
-  printf_begin();
+  log_init(baud);
   opslag_init();
   klok_init();
+  knoppen_init(0,4);
+  log_print("Alle componenten zijn geïnitialiseerd ");
 }
 
 void loop(){
-opslag_loop();
+  opslag_loop();
+  knoppen_loop();
   klok_loop();
 }
