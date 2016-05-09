@@ -5,15 +5,16 @@ int geheugen_geluid = 0;
 float geheugen_temperatuur = 0;
 int geheugen_co2 = 0;
 int geheugen_luchtvochtigheid = 0;
+int geheugen_gevoelsTemperatuur = 0;
 
 bool geheugen_enabled = true;
 
 inline void geheugen_enable(){
-  geheugen_enabled = true; 
+  geheugen_enabled = true;
 }
 
 inline void geheugen_disable(){
-  geheugen_enabled = false; 
+  geheugen_enabled = false;
 }
 
 void geheugen_set_lichtkleur(int val){
@@ -51,4 +52,3 @@ void geheugen_set_luchtvochtgeid(int val){
     geheugen_luchtvochtigheid = val;
   }
 }
-

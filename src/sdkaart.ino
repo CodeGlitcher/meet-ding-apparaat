@@ -10,6 +10,7 @@ String dataFile = "DATA.csv";
 */
 void opslag_init(int sdpin){
   opslag_pin = sdpin;
+  SdFile::dateTimeCallback(dateTime);
   if (!SD.begin(opslag_pin)) {
     log_println("SD-kaart niet gevonden");
     return;
@@ -26,7 +27,7 @@ void opslag_init(int sdpin){
 // check if file exist
  if (file) {
    // add header to file (TODO add more)
-   file.println("Tijd,Temperatuur,Luchtvochtigheid,kleur");
+   file.println("Tijd (ms),Tijd (String),Temperatuur,Gevoelstemperatuur,Luchtvochtigheid");
    // close the file:
    file.close();
  } else {
@@ -42,12 +43,14 @@ void opslag_loop(){
 /**
 * Voeg data toe aan het data bestand.
 */
-bool opslag_SaveData(long tijd, int temp, float luchtvochtigheid){
+bool opslag_SaveData(long tijd,String tijdString, float temp, float gevoelsTemp, float luchtvochtigheid){
   File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
   if (file) {
     opslag_addData(file, String(tijd));
+    opslag_addData(file,tijdString);
     opslag_addData(file, String(temp));
-    opslag_addData(file, String(luchtvochtigheid,2)); // float afronden 2 decimalen
+    opslag_addData(file, String(gevoelsTemp));
+    opslag_addData(file, String(luchtvochtigheid));
     file.println("");
     file.close();
     return true;
@@ -67,4 +70,15 @@ void opslag_addData(File f, String data){
 
 String opslag_getDataFileLocation(){
   return dataFolder + '/' + dataFile;
+}
+
+// call back for file timestamps
+void dateTime(uint16_t* date, uint16_t* time) {
+ DateTime now = rtc.now();
+
+ // return date using FAT_DATE macro to format fields
+ *date = FAT_DATE(now.year(), now.month(), now.day());
+
+ // return time using FAT_TIME macro to format fields
+ *time = FAT_TIME(now.hour(), now.minute(), now.second());
 }
