@@ -1,10 +1,10 @@
 
 /**
-* DHT11 Temperature Sensor
+* DHT22 Temperature Sensor
 */
 #include "DHT.h"
 #define DHTPIN 2
-#define DHTTYPE DHT11
+#define DHTTYPE DHT22
 DHT dht(DHTPIN, DHTTYPE);
 
 //temp values
@@ -18,22 +18,21 @@ void sensor_temp_init()  {
 }
 
 void sensor_temp_loop() {
-   if(millis() - prev_millis >= 1000) {
+   if(millis() - prev_millis >= 1000) { //1 sec test
      prev_millis = millis();
      sensor_temp_read_values();
   
      log_enable();
-  
+
+     //http://stackoverflow.com/questions/905928/using-floats-with-sprintf-in-embedded-c
      char str[100];
-     int d1 = celcius;            // Get the integer part (678).
-     float f2 = celcius - d1;     // Get fractional part (0.01234567).
-     int d2 = trunc(f2 * 10000);   // Turn into integer (123).
-     float f3 = f2 * 10000 - d2;   // Get next fractional part (0.4567).
-     int d3 = trunc(f3 * 10000);   // Turn into integer (4567).
+     int d1 = celcius; //get integer
+     float f2 = celcius - d1; //get fractional
+     int d2 = trunc(f2 * 10000); //to integer
   
-     sprintf (str, "Celcius: %d.%04d%04d\n", d1, d2, d3);
-  
+     sprintf (str, "Celcius: %d.%04d\n", d1, d2);
      log_println(str);
+     
      log_disable();
    }
 }
