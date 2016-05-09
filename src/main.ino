@@ -1,5 +1,10 @@
+// ANALOG 0-5
 #define POTMETER_PIN 0
+
+// INTERRTUPT 0-1
 #define SELECTEER_PIN 0
+
+// DIGITAL 3-13
 #define BUZZER_PIN 3
 #define LICHT_PIN 4
 
