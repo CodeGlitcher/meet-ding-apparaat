@@ -7,7 +7,7 @@
 // DIGITAL 3-13
 #define BUZZER_PIN 3
 #define LICHT_PIN 4
-#define TEMP_PIN 5
+#define TEMP_PIN 2
 
 const long baud = 57600;
 
@@ -18,7 +18,6 @@ void setup()  {
   knoppen_init(SELECTEER_PIN, POTMETER_PIN);
   buzzer_init(BUZZER_PIN);
   licht_init(LICHT_PIN);
-  
   sensor_temp_init();
 
   log_print("Alle componenten zijn geïnitialiseerd ");

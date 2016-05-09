@@ -3,9 +3,8 @@
 * DHT22 Temperature Sensor
 */
 #include "DHT.h"
-#define DHTPIN 2
 #define DHTTYPE DHT22
-DHT dht(DHTPIN, DHTTYPE);
+DHT dht(TEMP_PIN, DHTTYPE);
 
 //temp values
 float humidity, celcius, fahrenheit = 0.0;
@@ -13,7 +12,6 @@ float humidity, celcius, fahrenheit = 0.0;
 long prev_millis = 0;
 
 void sensor_temp_init()  {
-  Serial.begin(115200);
   dht.begin();
 }
 
