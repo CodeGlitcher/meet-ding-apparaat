@@ -5,8 +5,9 @@ void klok_init()
 
   if (! rtc.begin()) {
     log_println("Klok niet gevonden");
-
+    return;
   }
+  log_println("Klok gevonden");
   // use the following commands to set date and time
   // rtc.setDOW(TUESDAY);     // Set Day-of-Week to SUNDAY
   // rtc.setTime(10, 52, 0);     // Set the time to 12:00:00 (24hr format)
@@ -34,8 +35,7 @@ String klok_getDateTime(){
   out+= ":";
   out+= now.minute();
   // Send date
-  return "";
-
+  return out;
 }
 /**
 * Get unix time stemp
