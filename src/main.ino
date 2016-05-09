@@ -1,15 +1,23 @@
+#define POTMETER_PIN 0
+#define SELECTEER_PIN 0
+#define BUZZER_PIN 3
+#define LICHT_PIN 4
+
 const long baud = 57600;
 
 // Initieer alle componenten
 void setup(){
   log_init(baud);
   opslag_init();
-  knoppen_init(2,4);
+  knoppen_init(SELECTEER_PIN, POTMETER_PIN);
+  buzzer_init(BUZZER_PIN);
+  licht_init(LICHT_PIN);
 
-  log_print("Alle componenten zijn geïnitialiseerd ");
+  log_println("Alle componenten zijn geïnitialiseerd ");
 }
 
 void loop(){
   opslag_loop();
   knoppen_loop();
+  buzzer_loop();
 }
