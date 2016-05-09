@@ -5,6 +5,7 @@ long knoppen_laatst_gedrukt = 0;
 long knoppen_laatste_loop = 0;
 
 int knoppen_potmeter_laatste_waarde = -1;
+int knoppen_max_val = 100;
 
 void (*knoppen_select_func)(void);
 void (*knoppen_pot_func)(int);
@@ -78,7 +79,7 @@ int knoppen_potmeter_waarde()
     knoppen__potmeter_waarde = 0;
   }
 
-  knoppen__potmeter_waarde /= 10;
+  knoppen__potmeter_waarde /= (1000.0/knoppen_max_val);
 
   return knoppen__potmeter_waarde;
 }
