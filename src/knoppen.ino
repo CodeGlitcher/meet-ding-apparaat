@@ -52,7 +52,7 @@ void knoppen_loop()
     if (knoppen_potmeter_laatste_waarde != huidige_waarde){
       knoppen_potmeter_laatste_waarde = huidige_waarde;
       
-      char buffer[50];
+      char buffer[22];
       sprintf(buffer, "Potmeter waarde is: %d", huidige_waarde);
       log_println(buffer);
 
