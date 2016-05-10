@@ -8,10 +8,12 @@
 #define BUZZER_PIN 3
 #define LICHT_PIN 4
 
+#define SCHERM_BL 8
 #define SCHERM_DC 9
 #define SCHERM_CS 10
 
 const long baud = 57600;
+const bool debug = false;
 
 // Initieer alle componenten
 void setup(){
@@ -21,7 +23,9 @@ void setup(){
   buzzer_init(BUZZER_PIN);
   licht_init(LICHT_PIN);
   scherm_init();
-  knoppen_set_pot_callback(&pot_callback);
+
+  knoppen_set_pot_callback(&scherm_potmeter_changed);
+  knoppen_set_selecteer_callback(&scherm_selecteer_pressed);
 
   log_println("Alle componenten zijn geïnitialiseerd ");
 }
@@ -31,7 +35,5 @@ void loop(){
   opslag_loop();
   knoppen_loop();
   buzzer_loop();
-}
-
-void pot_callback(int val){
+  scherm_loop();
 }
