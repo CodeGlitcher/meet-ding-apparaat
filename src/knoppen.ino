@@ -1,6 +1,3 @@
-int knoppen_selecteer_pin;
-int knoppen_potmeter_pin;
-
 long knoppen_laatst_gedrukt = 0;
 long knoppen_laatste_loop = 0;
 
@@ -10,12 +7,9 @@ int knoppen_max_val = 100;
 void (*knoppen_select_func)(void);
 void (*knoppen_pot_func)(int);
 
-void knoppen_init(int selecteer, int pot)
+void knoppen_init()
 {
-  knoppen_selecteer_pin = selecteer;
-  knoppen_potmeter_pin = pot;
-
-  attachInterrupt(selecteer, knop_selecteer, FALLING);
+  attachInterrupt(SELECTEER_PIN, knop_selecteer, FALLING);
 }
 
 void knoppen_set_selecteer_callback(void(*f)(void))
@@ -69,7 +63,7 @@ void knoppen_loop()
 int knoppen_potmeter_waarde()
 {
   // 0 - 1023 -> 0-100
-  int knoppen__potmeter_waarde = analogRead(knoppen_potmeter_pin);
+  int knoppen__potmeter_waarde = analogRead(POTMETER_PIN);
 
   // 0-1000
   knoppen__potmeter_waarde -= 12;

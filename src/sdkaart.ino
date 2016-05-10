@@ -8,31 +8,33 @@ String dataFile = "DATA.csv";
 /**
 * This file contains logic for data storage
 */
-void opslag_init(int sdpin){
-  opslag_pin = sdpin;
+void opslag_init(){
   SdFile::dateTimeCallback(dateTime);
-  if (!SD.begin(opslag_pin)) {
+  
+  if (!SD.begin(SD_KAART_PIN)) {
     log_println("SD-kaart niet gevonden");
     return;
   }
+  
   if(SD.exists(opslag_getDataFileLocation())){
     log_println("Bestand bestaat");
     return;// bestand bestaat al.
   }
-  // maake folder
+  
+  // maak folder
   SD.mkdir(dataFolder);
+  
   // open data file
   File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
 
-// check if file exist
- if (file) {
-   // add header to file (TODO add more)
-   file.println("Tijd (ms),Tijd (String),Temperatuur,Gevoelstemperatuur,Luchtvochtigheid");
-   // close the file:
-   file.close();
- } else {
-   log_println("Data bestand aanmaken mislukt");
- }
+  // check if file exist
+  if (file) {
+    // Headerrow
+    file.println("Tijd (ms)|Tijd (String)|Temperatuur|Gevoelstemperatuur|Luchtvochtigheid");
+    file.close();
+  } else {
+    log_println("Data bestand aanmaken mislukt");
+  }
 
 }
 
@@ -43,29 +45,20 @@ void opslag_loop(){
 /**
 * Voeg data toe aan het data bestand.
 */
-bool opslag_SaveData(long tijd,String tijdString, float temp, float gevoelsTemp, float luchtvochtigheid){
+bool opslag_SaveData(long tijd, String tijdString, float temp, float gevoelsTemp, float luchtvochtigheid){
   File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
   if (file) {
-    opslag_addData(file, String(tijd));
-    opslag_addData(file,tijdString);
-    opslag_addData(file, String(temp));
-    opslag_addData(file, String(gevoelsTemp));
-    opslag_addData(file, String(luchtvochtigheid));
-    file.println("");
-    file.close();
+    
+    char buffer[100];
+    sprintf(buffer, "%d|%f|%f|%f", tijd, temp, gevoelsTemp, luchtvochtigheid);
+    log_println(buffer);
+    file.println(buffer);
+    
     return true;
   } else {
     log_println("Data bestand openen mislukt");
     return false;
   }
-}
-
-/**
-* File f, a open file, String data data to print
-*/
-void opslag_addData(File f, String data){
-  f.print(data);
-  f.print(",");
 }
 
 String opslag_getDataFileLocation(){

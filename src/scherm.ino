@@ -1,7 +1,3 @@
-#include "SPI.h"
-#include "Adafruit_GFX.h"
-#include <Adafruit_ST7735.h>
-
 //Adafruit_ILI9341 scherm = Adafruit_ILI9341(TFT_CS, TFT_DC);
 Adafruit_ST7735 scherm = Adafruit_ST7735(SCHERM_CS, SCHERM_DC);
 
@@ -64,10 +60,6 @@ void scherm_potmeter_changed(int val) {
   }
   
   scherm_draw_cijfer(35, 80, val);
-
-  if (debug){
-    scherm_draw_balk(12, 100, val);
-  }
 }
 
 void scherm_draw_bedankt(int x, int y){
@@ -93,18 +85,5 @@ void scherm_draw_cijfer(int x, int y, int val){
 
   scherm.print(buffer);
   scherm.setTextSize(1); 
-}
-
-void scherm_draw_balk(int x, int y, int val){
-  scherm.fillRect(x+val, y, 100-val, 20, ST7735_BLACK);
-  scherm.fillRect(x, y, val, 20, ST7735_WHITE);
-
-  
-  scherm.fillRect(x+110, y+5, 30, 10, ST7735_BLACK);
-  scherm.setTextSize(1);
-  scherm.setCursor(x+110, y+5);
-  char buffer[5];
-  sprintf(buffer, "%3d%%", val);
-  scherm.print(buffer);  
 }
 
