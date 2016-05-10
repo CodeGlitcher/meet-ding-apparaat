@@ -9,10 +9,11 @@
 // INTERRTUPT 0-1
 #define SELECTEER_PIN 0
 // DIGITAL 3-13
-#define DHTPIN 6
+#define TEMP_PIN 6
 #define BUZZER_PIN 3
 #define LICHT_PIN 4
 #define SD_KAART_PIN 5
+#define CO2_PIN A1
 const long baud = 115200;
 
 #include "DHT.h"

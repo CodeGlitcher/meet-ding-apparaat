@@ -2,7 +2,7 @@
 /**
 * DHT22 Temperature Sensor
 */
-DHT dht(DHTPIN, DHTTYPE);
+DHT dht(TEMP_PIN, DHTTYPE);
 
 //temp values
 float humidity, celcius, fahrenheit = 0.0;
