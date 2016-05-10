@@ -6,17 +6,15 @@
 #define MAX_POINT_VOLTAGE (0.265) //define the output of the sensor in volts when the concentration of CO2 is 10,000PPM
 #define REACTION_VOLTGAE (0.059) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
 
-float CO2Curve[3] = {ZERO_POINT_X, ZERO_POINT_VOLTAGE, (REACTION_VOLTGAE / (ZERO_POINT_X - 4))};
+float CO2Curve[3] = {ZERO_POINT_X, ZERO_POINT_VOLTAGE, (REACTION_VOLTGAE / (2.602 - 4))};
+int percentage;
 
 void sensor_co2_init() {
   Serial.print("Co2(MG-811) Init\n");
 }
 
 void sensor_co2_loop() {
-  int percentage;
-  float volts;
-  volts = MGRead(MG_PIN);
-  percentage = MGGetPercentage(volts, CO2Curve);
+
 }
 
 int sensor_co2_ppm() {
@@ -29,11 +27,12 @@ int sensor_co2_ppm() {
   }
   v = (v / READ_SAMPLE_TIMES) * 5 / 1024 ;
 
-  volts = v / DC_GAIN;
+  float volts = v / DC_GAIN;
   if (volts > ZERO_POINT_VOLTAGE || MAX_POINT_VOLTAGE < 0.265 ) {
     return -1;
   } else {
-    return pow(10, (volts - CO2Curve[1]) / CO2Curve[2] + CO2Curve[0]);
+    float *pcurve = CO2Curve;
+    return pow(10, (volts - pcurve[1]) / pcurve[2] + pcurve[0]);
     volts = 0;
   }
 }
