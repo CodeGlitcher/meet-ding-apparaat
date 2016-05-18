@@ -2,12 +2,11 @@ long knoppen_laatst_gedrukt = 0;
 long knoppen_laatste_loop = 0;
 
 int knoppen_potmeter_laatste_waarde = -1;
-int knoppen_max_val = 100;
 
 void (*knoppen_select_func)(void);
 void (*knoppen_pot_func)(int);
 
-void knoppen_init()
+inline void knoppen_init()
 {
   attachInterrupt(SELECTEER_PIN, knop_selecteer, FALLING);
 }
@@ -54,7 +53,7 @@ void knoppen_loop()
       if (knoppen_pot_func){
         knoppen_pot_func(huidige_waarde);
       } else {
-        log_println("Geen potmeter callback");
+        log_println(F("Geen potmeter callback"));
       }
     }
   }
@@ -73,7 +72,7 @@ int knoppen_potmeter_waarde()
     knoppen__potmeter_waarde = 0;
   }
 
-  knoppen__potmeter_waarde /= (1000.0/knoppen_max_val);
+  knoppen__potmeter_waarde /= (1000.0/100);
 
   return knoppen__potmeter_waarde;
 }

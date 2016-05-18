@@ -5,6 +5,7 @@
 #include "DHT.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ST7735.h"
+//#include "Fonts/FreeSans18pt7b.h"
 
 #define DHTTYPE DHT22
 
@@ -19,8 +20,9 @@
 #define SCHERM_DC 9
 #define SCHERM_CS 10
 
+#define CELCIUS_CORRECTION -2
+
 const long baud = 57600;
-const bool debug = true;
 
 void setup(){
   log_init();
@@ -29,32 +31,17 @@ void setup(){
   opslag_init();
   klok_init();
   scherm_init();
-  sensor_temp_init();
+  //sensor_temp_init();
 
-  knoppen_set_pot_callback(&scherm_potmeter_changed);
-  knoppen_set_selecteer_callback(&scherm_selecteer_pressed);
+  knoppen_set_pot_callback(&interface_potmeter_changed);
+  knoppen_set_selecteer_callback(&interface_selecteer_pressed);
 
-  log_println("Alle componenten zijn geïnitialiseerd ");
+  log_println(F("Alle componenten zijn geïnitialiseerd "));
 }
 
-long lastloop = 0;
-int screen = 1;
 void loop(){
-  opslag_loop();
   knoppen_loop();
-  scherm_loop();
-  sensor_temp_loop();
-  klok_loop();
+  interface_loop();
 
-  if(debug && millis() - lastloop > 1000){
-    lastloop = millis();
-    
-    //sensor_temp_read_values();
-    float humidity = 0.0;//sensor_temp_humidity();
-    float temp = 0.0;//sensor_temp_celcius();
-    float heatIndex = 0.0;//sensor_temp_heatindex_c();
-    long  time = klok_getUnitxTime();
-    String timeString = klok_getDateTime();
-    opslag_SaveData(time, timeString,temp,heatIndex,humidity);
-  }
+  scherm_debug();
 }

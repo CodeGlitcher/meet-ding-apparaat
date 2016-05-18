@@ -3,21 +3,21 @@
 
 int opslag_pin;
 // alles komt om een of andere rede in hoofdletters te staan. Hier ook maar.
-String dataFolder = "ARDUINO/DATA";
+String dataFolder = "ARDUINO";
 String dataFile = "DATA.csv";
 /**
 * This file contains logic for data storage
 */
-void opslag_init(){
+inline void opslag_init(){
   SdFile::dateTimeCallback(dateTime);
   
   if (!SD.begin(SD_KAART_PIN)) {
-    log_println("SD-kaart niet gevonden");
+    log_println(F("SD-kaart niet gevonden"));
     return;
   }
   
   if(SD.exists(opslag_getDataFileLocation())){
-    log_println("Bestand bestaat");
+    log_println(F("Bestand bestaat"));
     return;// bestand bestaat al.
   }
   
@@ -30,33 +30,40 @@ void opslag_init(){
   // check if file exist
   if (file) {
     // Headerrow
-    file.println("Tijd (ms)|Tijd (String)|Temperatuur|Gevoelstemperatuur|Luchtvochtigheid");
+    file.println(F("Tijd (ms),Tijd (String),Cijfer,Temperatuur,Gevoelstemperatuur,Luchtvochtigheid,lichtkleur,lichtsterkte,co2, geluid"));
     file.close();
   } else {
-    log_println("Data bestand aanmaken mislukt");
+    log_println(F("Data bestand aanmaken mislukt"));
   }
-
-}
-
-void opslag_loop(){
 
 }
 
 /**
 * Voeg data toe aan het data bestand.
 */
-bool opslag_SaveData(long tijd, String tijdString, float temp, float gevoelsTemp, float luchtvochtigheid){
+bool opslag_SaveData(long tijd, char* tijdString, float temp, float gevoelsTemp, float luchtvochtigheid){
   File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
   if (file) {
+    int cijfer = knoppen_potmeter_waarde();
+    int lichtsterkte = analogRead(A1);
+
+    char tempS[8];
+    char gevoelsTempS[8];
+    char luchtvochtigheidS[8];
+    
+    dtostrf(temp,-4,2,tempS);
+    dtostrf(gevoelsTemp,-4,2,gevoelsTempS);
+    dtostrf(luchtvochtigheid,-4,2,luchtvochtigheidS);
     
     char buffer[100];
-    sprintf(buffer, "%d|%f|%f|%f", tijd, temp, gevoelsTemp, luchtvochtigheid);
+    sprintf(buffer, "%ld,%s,%d,%s,%s,%s,%d,%d,%d,%d", tijd, tijdString, cijfer, tempS, gevoelsTempS, luchtvochtigheidS, 0, lichtsterkte, 0, 0);
     log_println(buffer);
     file.println(buffer);
+    file.close();
     
     return true;
   } else {
-    log_println("Data bestand openen mislukt");
+    log_println(F("Data bestand openen mislukt"));
     return false;
   }
 }

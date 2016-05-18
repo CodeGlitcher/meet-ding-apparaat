@@ -1,6 +1,6 @@
 bool log_enabled = true;
 
-void log_init()
+inline void log_init()
 {
   Serial.begin(baud);
 }

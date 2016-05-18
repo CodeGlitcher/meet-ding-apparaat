@@ -4,43 +4,28 @@ void klok_init()
 {
 
   if (! rtc.begin()) {
-    log_println("Klok niet gevonden");
+    log_println(F("Klok niet gevonden"));
     return;
   }
-  log_println("Klok gevonden");
+  log_println(F("Klok gevonden"));
   // use the following commands to set date and time
   // rtc.setDOW(TUESDAY);     // Set Day-of-Week to SUNDAY
   // rtc.setTime(10, 52, 0);     // Set the time to 12:00:00 (24hr format)
   // rtc.setDate(26, 4, 2016);   // Set the date to January 1st, 2014
 }
 
-void klok_loop()
-{
-
-}
 /**
 * Get date time sting.
 * 26-4-2016 -- 12:00
 */
-String klok_getDateTime(){
+inline void klok_getDateTime(char *buffer){
   DateTime now = rtc.now();
-  String out = "";
-  out +=now.day() ;
-  out+= "-";
-  out+= now.month();
-  out+= "-";
-  out+= now.year();
-  out+= " -- " ;
-  out+= now.hour();
-  out+= ":";
-  out+= now.minute();
-  // Send date
-  return out;
+  sprintf(buffer, "%02d-%02d-%04d %02d:%02d", now.day(), now.month(), now.year(), now.hour(), now.minute());
 }
 /**
 * Get unix time stemp
 */
-long klok_getUnitxTime(){
+inline long klok_getUnixTime(){
   DateTime now = rtc.now();
   return now.unixtime();
 }
