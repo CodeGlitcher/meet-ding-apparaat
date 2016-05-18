@@ -43,5 +43,5 @@ void loop(){
   knoppen_loop();
   interface_loop();
 
-  scherm_debug();
+  //scherm_debug();
 }

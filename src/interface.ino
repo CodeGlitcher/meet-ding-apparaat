@@ -6,7 +6,7 @@ inline void interface_loop(){
   if (modus==0){
     scherm_reset();
     scherm_stel_vraag();
-    scherm_draw_cijfer(35, 80, -1);
+    scherm_draw_cijfer(35, 90, -1);
     scherm_aan();
     modus = 1;
   }
@@ -48,5 +48,5 @@ void interface_potmeter_changed(int val) {
     return;
   }
   
-  scherm_draw_cijfer(35, 80, val);
+  scherm_draw_cijfer(35, 90, val);
 }

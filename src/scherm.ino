@@ -1,7 +1,7 @@
 //Adafruit_ILI9341 scherm = Adafruit_ILI9341(TFT_CS, TFT_DC);
 Adafruit_ST7735 scherm = Adafruit_ST7735(SCHERM_CS, SCHERM_DC);
 
-int scherm_prev_voorkomma = -1, scherm_prev_nakomma = -1;
+bool scherm_changed = false;
 
 inline void scherm_init() {
   pinMode(SCHERM_BL, OUTPUT);
@@ -32,13 +32,6 @@ void scherm_draw_bedankt(int x, int y){
 }
 
 void scherm_draw_cijfer(int x, int y, int val){
-  //scherm.fillRect(x, y, 100, 40, ST7735_BLACK);
-
-//  scherm.drawRect(x, y, 18, 24, ST7735_RED);
-//  scherm.drawRect(x+18, y, 18, 24, ST7735_RED);
-//  scherm.drawRect(x+36, y, 18, 24, ST7735_RED);
-//  scherm.drawRect(x+54, y, 18, 24, ST7735_RED);
-//  scherm.drawRect(x+72, y, 18, 24, ST7735_RED);
   if (val==-1){
     scherm.setTextSize(2);
     scherm.setTextColor(0x666666);
@@ -49,33 +42,27 @@ void scherm_draw_cijfer(int x, int y, int val){
     return;
   } 
 
-  if (scherm_prev_voorkomma == -1){
+  if (!scherm_changed){
     scherm.fillRect(0, y, scherm.width(), 100, ST7735_BLACK);
   }
+  scherm_changed = true;
 
-  scherm.setTextSize(3);  
+  char a[7][12];
+  strcpy(a[0], "Zeer slecht");
+  strcpy(a[1], "  Slecht   ");
+  strcpy(a[2], "   Matig   ");
+  strcpy(a[3], " Voldoende ");
+  strcpy(a[4], "  Redelijk ");
+  strcpy(a[5], "   Goed    ");
+  strcpy(a[6], " Zeer goed ");
 
-  // Bereken het cijfer
-  int voorKomma = val/10;
-  int naKomma = val%10;
+  int len = strlen(a[val]);
   
-  char buffer[3];
-  if ( voorKomma != scherm_prev_voorkomma ) {
-    scherm_prev_voorkomma = voorKomma;
-    scherm.fillRect(x, y, 36, 24, ST7735_BLACK);
-    sprintf(buffer, "%2d", voorKomma); 
-
-    scherm.setCursor(x,y);
-    scherm.print(buffer);
-  }
-  scherm.setCursor(x+36,y);
-  scherm.print(',');
-  if ( naKomma != scherm_prev_nakomma ) {
-    scherm_prev_nakomma = naKomma;
-    scherm.fillRect(x+54, y, 18, 24, ST7735_BLACK);
-    sprintf(buffer, "%d", naKomma); 
-    scherm.print(buffer);
-  }
+  scherm.setTextSize(2);
+  //scherm.fillRect(12 + len * 12 , y, (11 - len) * 12, 24, ST7735_BLACK);
+  scherm.setTextColor(ST7735_WHITE, ST7735_BLACK);
+  scherm.setCursor(12,y);
+  scherm.print(a[val]);
 }
 
 void scherm_stel_vraag(){
@@ -90,8 +77,7 @@ void scherm_stel_vraag(){
 
 void scherm_reset(){
   scherm.fillScreen(ST7735_BLACK);
-  scherm_prev_voorkomma = -1;
-  scherm_prev_nakomma= -1;
+  scherm_changed = false;
 }
 
 long scherm_last_debug = 0;
