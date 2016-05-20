@@ -46,33 +46,57 @@ void scherm_draw_cijfer(int x, int y, int val){
     scherm.fillRect(0, y, scherm.width(), 100, ST7735_BLACK);
   }
   scherm_changed = true;
+  char antwoord[80];
+  if(opslag_getAntwoord(val, antwoord)) {
+    scherm.fillRect(0,y+16, scherm.width(), 18, ST7735_BLACK);
+    int length = strlen(antwoord);
+    scherm.fillRect(12*length, y, scherm.width(), 18, ST7735_BLACK);
+    scherm.setTextSize(2);    
+    scherm.setTextColor(ST7735_WHITE, ST7735_BLACK);
+    scherm.setCursor(12,y);
+    scherm.println(antwoord);
+  } else {
+    log_println("Antwoord niet gevonden!");
+  }
 
-  char a[7][12];
-  strcpy(a[0], "Zeer slecht");
-  strcpy(a[1], "  Slecht   ");
-  strcpy(a[2], "   Matig   ");
-  strcpy(a[3], " Voldoende ");
-  strcpy(a[4], "  Redelijk ");
-  strcpy(a[5], "   Goed    ");
-  strcpy(a[6], " Zeer goed ");
-
-  int len = strlen(a[val]);
-  
-  scherm.setTextSize(2);
-  //scherm.fillRect(12 + len * 12 , y, (11 - len) * 12, 24, ST7735_BLACK);
-  scherm.setTextColor(ST7735_WHITE, ST7735_BLACK);
-  scherm.setCursor(12,y);
-  scherm.print(a[val]);
+//  char a[7][12];
+//  strcpy(a[0], "Zeer slecht");
+//  strcpy(a[1], "  Slecht   ");
+//  strcpy(a[2], "   Matig   ");
+//  strcpy(a[3], " Voldoende ");
+//  strcpy(a[4], "  Redelijk ");
+//  strcpy(a[5], "   Goed    ");
+//  strcpy(a[6], " Zeer goed ");
+//
+//  int len = strlen(a[val]); 
+//  scherm.setTextSize(2);
+//  scherm.fillRect(12 + len * 12 , y, (11 - len) * 12, 24, ST7735_BLACK);
+//  scherm.setTextColor(ST7735_WHITE, ST7735_BLACK);
+//  scherm.setCursor(12,y);
+//  scherm.print(a[val]);
 }
 
 void scherm_stel_vraag(){
+
+  int vraag = random(opslag_getVraagAantal());
+  Serial.println(vraag);
+  char vraagBuf[80];
+  if(opslag_getVraag(vraag, vraagBuf)) {
+    scherm.setTextSize(2);
+    scherm.setCursor(0,0);
+    scherm.println(vraagBuf);
+  }
+
+  
+  /*
   scherm.setTextSize(2);
   scherm.setCursor(5,5);
   scherm.print(F("Welk cijfer"));
   scherm.setCursor(5,25);
   scherm.print(F("geeft u deze"));
   scherm.setCursor(5,45);
-  scherm.print(F("werkruimte?"));  
+  scherm.print(F("werkruimte?")); 
+  */ 
 }
 
 void scherm_reset(){
@@ -93,7 +117,7 @@ void scherm_debug(){
     scherm.drawRect(-1, -1, 33, 51, ST7735_RED);
 
     scherm.setCursor(1, 1);
-    scherm.println(analogRead(A1));
+    scherm.println(analogRead(1));
     scherm.setCursor(1, 11);
     scherm.println(sensor_temp_humidity());
     scherm.setCursor(1, 21);

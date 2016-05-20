@@ -72,8 +72,8 @@ int knoppen_potmeter_waarde()
     knoppen__potmeter_waarde = 0;
   }
 
-  knoppen__potmeter_waarde /= (1000.0/7);
-  knoppen__potmeter_waarde = knoppen__potmeter_waarde == 7 ? 6 : knoppen__potmeter_waarde;
+  knoppen__potmeter_waarde /= (1000.0/opslag_getAntwoordAantal());
+  knoppen__potmeter_waarde = knoppen__potmeter_waarde == opslag_getAntwoordAantal() ? opslag_getAntwoordAantal()-1 : knoppen__potmeter_waarde;
 
   return knoppen__potmeter_waarde;
 }

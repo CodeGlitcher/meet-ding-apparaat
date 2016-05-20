@@ -5,6 +5,7 @@
 #include "DHT.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ST7735.h"
+#include "IniFile.h"
 //#include "Fonts/FreeSans18pt7b.h"
 
 #define DHTTYPE DHT22

@@ -20,7 +20,7 @@ void klok_init()
 */
 inline void klok_getDateTime(char *buffer){
   DateTime now = rtc.now();
-  sprintf(buffer, "%02d-%02d-%04d %02d:%02d", now.day(), now.month(), now.year(), now.hour(), now.minute());
+  sprintf(buffer, "%04d-%02d-%02d %02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute());
 }
 /**
 * Get unix time stemp
