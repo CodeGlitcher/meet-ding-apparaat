@@ -47,7 +47,7 @@ void scherm_draw_cijfer(int x, int y, int val){
   }
   scherm_changed = true;
   char antwoord[80];
-  if(opslag_getAntwoord(val, antwoord)) {
+  if(opslag_getAntwoord(opslag_getVraagNr(), val, antwoord)) {
     scherm.fillRect(0,y+16, scherm.width(), 18, ST7735_BLACK);
     int length = strlen(antwoord);
     scherm.fillRect(12*length, y, scherm.width(), 18, ST7735_BLACK);
@@ -76,16 +76,17 @@ void scherm_draw_cijfer(int x, int y, int val){
 //  scherm.print(a[val]);
 }
 
+int scherm_curvraagnr = 0;
+
 void scherm_stel_vraag(){
 
-  int vraag = random(opslag_getVraagAantal());
-  Serial.println(vraag);
   char vraagBuf[80];
-  if(opslag_getVraag(vraag, vraagBuf)) {
+  if(opslag_getVraag(scherm_curvraagnr, vraagBuf)) {
     scherm.setTextSize(2);
     scherm.setCursor(0,0);
     scherm.println(vraagBuf);
   }
+  scherm_curvraagnr = (scherm_curvraagnr + 1) % opslag_getVraagAantal(); 
 
   
   /*

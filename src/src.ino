@@ -28,7 +28,13 @@ const long baud = 57600;
 void setup(){
   log_init();
   knoppen_init();
-
+  randomSeed(analogRead(2));
+  pinMode(SD_KAART_PIN, OUTPUT);
+  pinMode(SCHERM_CS, OUTPUT);
+  digitalWrite(SD_KAART_PIN, HIGH);
+  digitalWrite(SCHERM_CS, HIGH);
+  
+  
   opslag_init();
   klok_init();
   scherm_init();
@@ -44,5 +50,5 @@ void loop(){
   knoppen_loop();
   interface_loop();
 
-  //scherm_debug();
+  scherm_debug();
 }

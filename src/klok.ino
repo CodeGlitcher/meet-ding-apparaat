@@ -29,3 +29,8 @@ inline long klok_getUnixTime(){
   DateTime now = rtc.now();
   return now.unixtime();
 }
+
+int klok_getHour() {
+  return rtc.now().hour();
+}
+

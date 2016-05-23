@@ -13,13 +13,19 @@ inline void interface_loop(){
 
   if (modus == 2){
     sensor_temp_read_values();
-    double humidity = sensor_temp_humidity();
-    double temp = sensor_temp_celcius();
-    double heatIndex = sensor_temp_heatindex_c();
     long  time = klok_getUnixTime();
     char timeString[17];
     klok_getDateTime(timeString);
-    opslag_SaveData(time, timeString,temp,heatIndex,humidity);
+    double temp = sensor_temp_celcius();
+    double heatIndex = sensor_temp_heatindex_c();
+    double humidity = sensor_temp_humidity();
+    int lichtKleur = 0;
+    int lichtSterkte = analogRead(1);
+    int CO2 = 0;
+    int geluid = 0;
+    int antwoordNr = knoppen_potmeter_waarde();
+    
+    opslag_SaveData(time, timeString,temp,heatIndex,humidity, lichtKleur, lichtSterkte, CO2, geluid, antwoordNr);
 
     modus_last_change = millis();
     scherm_reset();

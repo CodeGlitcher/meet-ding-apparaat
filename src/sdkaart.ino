@@ -5,6 +5,13 @@ int opslag_pin;
 int opslag_aantal_antwoorden;
 int opslag_aantal_vragen;
 int opslag_vraag_nr;
+int opslag_antwoord_nr;
+
+int opslag_begintijd;
+int opslag_eindtijd;
+
+
+
 // alles komt om een of andere rede in hoofdletters te staan. Hier ook maar.
 String dataFolder = "ARDUINO";
 String dataFile = "DATA.csv";
@@ -13,7 +20,7 @@ String dataFile = "DATA.csv";
 */
 inline void opslag_init(){
   SdFile::dateTimeCallback(dateTime);
-  
+ 
   if (!SD.begin(SD_KAART_PIN)) {
     log_println(F("SD-kaart niet gevonden"));
     return;
@@ -31,7 +38,7 @@ inline void opslag_init(){
     // check if file exist
     if (file) {
       // Headerrow
-      file.println(F("Tijd (ms),Tijd (String),Cijfer,Temperatuur,Gevoelstemperatuur,Luchtvochtigheid,lichtkleur,lichtsterkte,co2,geluid"));
+      file.println(F("Tijd(ms),Datum,Temperatuur,Gevoelstemperatuur,Luchtvochtigheid,Lichtkleur,Lichtsterkte,CO2,Geluid,Vraagnummer,Vraag,Antwoordnummer,Antwoord"));
       file.close();
     } else {
       log_println(F("Data bestand aanmaken mislukt"));
@@ -40,6 +47,7 @@ inline void opslag_init(){
   
   if(ini.open()) {
     char retBuf[80];
+    
     //aantal vragen ophalen
     opslag_aantal_vragen = 0;
     char buf[8];
@@ -48,25 +56,25 @@ inline void opslag_init(){
       opslag_aantal_vragen++;
       sprintf(buf, "vraag%d", opslag_aantal_vragen);
     }
+    
+    //begin en eind tijden ophalen
+    if(!ini.getValue("tijden", "begintijd", retBuf, 80, opslag_begintijd) || !ini.getValue("tijden", "eindtijd", retBuf, 80, opslag_eindtijd)) {
+      log_println(F("Kan tijden niet inlezen"));
+    }
+    
     ini.close();
   } else {
     log_println(F("Config file niet aanwezig"));
   }
-
-  
-
-
 }
 
 /**
 * Voeg data toe aan het data bestand.
 */
-bool opslag_SaveData(long tijd, char* tijdString, float temp, float gevoelsTemp, float luchtvochtigheid){
+bool opslag_SaveData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtKleur, int lichtSterkte, int CO2, int geluid, int antwoordNr){
   File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
   if (file) {
-    int cijfer = knoppen_potmeter_waarde();
-    int lichtsterkte = analogRead(1);
-
+    
     char tempS[8];
     char gevoelsTempS[8];
     char luchtvochtigheidS[8];
@@ -74,9 +82,14 @@ bool opslag_SaveData(long tijd, char* tijdString, float temp, float gevoelsTemp,
     dtostrf(temp,-4,2,tempS);
     dtostrf(gevoelsTemp,-4,2,gevoelsTempS);
     dtostrf(luchtvochtigheid,-4,2,luchtvochtigheidS);
+
+    char vraag[80];
+    char antwoord[80];
+    opslag_getVraag(opslag_vraag_nr, vraag);
+    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, antwoord);
     
     char buffer[100];
-    sprintf(buffer, "%ld,%s,%d,%s,%s,%s,%d,%d,%d,%d", tijd, tijdString, cijfer, tempS, gevoelsTempS, luchtvochtigheidS, 0, lichtsterkte, 0, 0);
+    sprintf(buffer, "%ld,%s,%s,%s,%s,%d,%d,%d,%d,%d,%s,%d,%s", tijd, datum, tempS, gevoelsTempS, luchtvochtigheidS, lichtKleur, lichtSterkte, CO2, geluid, opslag_vraag_nr, vraag, antwoordNr, antwoord);
     log_println(buffer);
     file.println(buffer);
     file.close();
@@ -138,15 +151,20 @@ int opslag_getVraagAantal() {
   return opslag_aantal_vragen;
 }
 
-bool opslag_getAntwoord(int antwoordnr, char* antwoordbuf) {
+int opslag_getVraagNr() {
+  return opslag_vraag_nr;
+}
+
+bool opslag_getAntwoord(int vraagnr, int antwoordnr, char* antwoordbuf) {
   if(!ini.open() || antwoordnr < 0 || antwoordnr >= opslag_aantal_antwoorden) {
     return false;
   }
-  char antwoord[11];
+  
+  char antBuf[11];
   char vrgBuf[8];
-  sprintf(vrgBuf, "vraag%d", opslag_vraag_nr);
-  sprintf(antwoord, "antwoord%d", antwoordnr);
-  if(ini.getValue(vrgBuf, antwoord, antwoordbuf, 80)) {
+  sprintf(vrgBuf, "vraag%d", vraagnr);
+  sprintf(antBuf, "antwoord%d", antwoordnr);
+  if(ini.getValue(vrgBuf, antBuf, antwoordbuf, 80)) {
     ini.close();
     return true;
   }
