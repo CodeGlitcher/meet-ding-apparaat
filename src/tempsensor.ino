@@ -42,5 +42,5 @@ float sensor_temp_heatindex_c() {
 
 //Fahrenheit == false
 float sensor_temp_heatindex_f() {
-  return dht.computeHeatIndex(fahrenheit, humidity, false);
+  return dht.computeHeatIndex(fahrenheit, humidity, true);
 }
