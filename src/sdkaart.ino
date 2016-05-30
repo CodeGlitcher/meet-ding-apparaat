@@ -21,9 +21,9 @@ String dataFile = "DATA.csv";
 inline void opslag_init(){
   SdFile::dateTimeCallback(dateTime);
  
-  if (!SD.begin(SD_KAART_PIN)) {
+  while (!SD.begin(SD_KAART_PIN)) {
     log_println(F("SD-kaart niet gevonden"));
-    return;
+    delay(500);
   }
   
   if(!SD.exists(opslag_getDataFileLocation())){
