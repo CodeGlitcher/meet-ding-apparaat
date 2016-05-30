@@ -1,6 +1,3 @@
-
-IniFile ini = IniFile("config.ini");
-
 int opslag_pin;
 int opslag_aantal_antwoorden;
 int opslag_aantal_vragen;
@@ -15,6 +12,10 @@ int opslag_eindtijd;
 // alles komt om een of andere rede in hoofdletters te staan. Hier ook maar.
 String dataFolder = "ARDUINO";
 String dataFile = "DATA.csv";
+String configFile = "config.ini";
+
+IniFile ini = IniFile("ARDUINO/config.ini");
+
 /**
 * This file contains logic for data storage
 */
@@ -87,8 +88,9 @@ bool opslag_SaveData(long tijd, char* datum, float temp, float gevoelsTemp, floa
     char antwoord[80];
     opslag_getVraag(opslag_vraag_nr, vraag);
     opslag_getAntwoord(opslag_vraag_nr, antwoordNr, antwoord);
+    Serial.println(antwoord);
     
-    char buffer[100];
+    char buffer[200];
     sprintf(buffer, "%ld,%s,%s,%s,%s,%d,%d,%d,%d,%d,%s,%d,%s", tijd, datum, tempS, gevoelsTempS, luchtvochtigheidS, lichtKleur, lichtSterkte, CO2, geluid, opslag_vraag_nr, vraag, antwoordNr, antwoord);
     log_println(buffer);
     file.println(buffer);
@@ -105,6 +107,10 @@ String opslag_getDataFileLocation(){
   return dataFolder + '/' + dataFile;
 }
 
+String opslag_getConfigFileLocation(){
+  return dataFolder + '/' + configFile;
+}
+
 // call back for file timestamps
 void dateTime(uint16_t* date, uint16_t* time) {
  DateTime now = rtc.now();
@@ -114,6 +120,52 @@ void dateTime(uint16_t* date, uint16_t* time) {
 
  // return time using FAT_TIME macro to format fields
  *time = FAT_TIME(now.hour(), now.minute(), now.second());
+}
+
+void opslag_sendData() {
+  File file = SD.open(opslag_getDataFileLocation(), FILE_READ);
+  if (file) {
+    while (file.available()) {
+      Serial.write(file.read());
+    }
+    file.close();
+  } else {
+    log_println(F("Kan data file niet openen"));
+  }
+}
+
+void opslag_sendConfig() {
+  File file = SD.open(opslag_getConfigFileLocation(), FILE_READ);
+  if (file) {
+    while (file.available()) {
+      Serial.write(file.read());
+    }
+    file.close();
+  } else {
+    log_println(F("Kan config file niet openen"));
+  }
+}
+
+void opslag_recConfig() {
+  if(SD.exists(opslag_getConfigFileLocation())) {
+    if(!SD.remove(opslag_getConfigFileLocation())) {
+      log_println(F("Kan config file niet verwijderen"));
+    }
+  }
+  File file = SD.open(opslag_getConfigFileLocation(), FILE_WRITE);
+  if(file) {
+    while(Serial.available()) {
+      char in = (char)Serial.read();
+      file.write(in);
+      Serial.write(in);
+      if(!Serial.available()) {
+        delay(5);
+      }
+    }
+    file.close();
+  } else {
+    log_println(F("Kan config file niet aanmaken"));
+  }
 }
 
 bool opslag_getVraag(int vraagnr, char* retBuf) {
@@ -157,6 +209,7 @@ int opslag_getVraagNr() {
 
 bool opslag_getAntwoord(int vraagnr, int antwoordnr, char* antwoordbuf) {
   if(!ini.open() || antwoordnr < 0 || antwoordnr >= opslag_aantal_antwoorden) {
+    log_println("Er ging iets mis");
     return false;
   }
   
@@ -169,6 +222,7 @@ bool opslag_getAntwoord(int vraagnr, int antwoordnr, char* antwoordbuf) {
     return true;
   }
   ini.close();
+  log_println("antwoord wordt niet goed opgehaald");
   return false;
 }
 

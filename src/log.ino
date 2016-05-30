@@ -2,7 +2,7 @@ bool log_enabled = true;
 
 inline void log_init()
 {
-  Serial.begin(baud);
+  Serial.begin(baud, SERIAL_8N1);
 }
 
 void log_print(char* msg)

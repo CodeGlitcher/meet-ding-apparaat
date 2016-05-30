@@ -23,7 +23,7 @@
 
 #define CELCIUS_CORRECTION -2
 
-const long baud = 57600;
+const long baud = 38400;
 
 void setup(){
   log_init();
@@ -50,5 +50,42 @@ void loop(){
   knoppen_loop();
   interface_loop();
 
-  scherm_debug();
+//  scherm_debug();
+}
+
+void serialEvent() {
+  if (Serial.available()) {
+    // get the new byte:
+    delay(5);
+    char inChar = (char)Serial.read();
+    if(inChar == '#' && Serial.available()) {
+      inChar = (char)Serial.read();
+      switch(inChar) {
+        case '0' :
+          break;
+        case '1' : 
+          opslag_sendData();
+          break;
+        case '2' :
+          opslag_sendConfig();
+          break;
+        case '3' :
+          opslag_recConfig();
+          break;
+        case '4' :
+          char en = (char)Serial.read();
+          if(en == 't') {
+            log_enable();
+          } else if(en == 'f') {
+            log_disable();
+          }
+          break;
+      }
+      Serial.print('$');
+      Serial.print(inChar);
+    }
+    while(Serial.available()) {
+      Serial.read();
+    }
+  }
 }
