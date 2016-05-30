@@ -124,7 +124,10 @@ void dateTime(uint16_t* date, uint16_t* time) {
 
 void opslag_sendData() {
   File file = SD.open(opslag_getDataFileLocation(), FILE_READ);
+
+  
   if (file) {
+    Serial.println(file.size());
     while (file.available()) {
       Serial.write(file.read());
     }
