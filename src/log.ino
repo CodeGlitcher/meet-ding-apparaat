@@ -2,7 +2,14 @@ bool log_enabled = true;
 
 inline void log_init()
 {
-  Serial.begin(baud);
+  
+  digitalWrite(LOG_PIN,HIGH);
+  if(digitalRead(LOG_PIN) == HIGH){
+   log_disable();
+  }
+
+  
+  Serial.begin(baud, SERIAL_8N1);
 }
 
 void log_print(char* msg)
