@@ -22,16 +22,18 @@
 #define SCHERM_CS 10
 #define LOG_PIN 41
 #define CELCIUS_CORRECTION -2
-
-const long baud = 38400;
+#define SS_PIN 53
+#define RESET_PIN 39
+const long baud = 115200;
 
 void setup(){
+  
+  pinMode(RESET_PIN, INPUT);
+  digitalWrite(RESET_PIN, LOW);
+
 
   log_init();
-
-  
-
-  
+   log_println(F("Setup"));
   knoppen_init();
   randomSeed(analogRead(2));
   pinMode(SD_KAART_PIN, OUTPUT);
@@ -39,12 +41,13 @@ void setup(){
   pinMode(LOG_PIN, INPUT);
   digitalWrite(SD_KAART_PIN, HIGH);
   digitalWrite(SCHERM_CS, HIGH);
+  pinMode(SS_PIN, OUTPUT); // change this to 53 on a mega  // don't follow this!!
+  digitalWrite(SS_PIN, HIGH); // Add this line
 
- 
   opslag_init();
   klok_init();
   scherm_init();
-  //sensor_temp_init();
+  sensor_temp_init();
 
   knoppen_set_pot_callback(&interface_potmeter_changed);
   knoppen_set_selecteer_callback(&interface_selecteer_pressed);
