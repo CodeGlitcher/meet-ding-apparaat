@@ -23,7 +23,7 @@
 #define SCHERM_CS 10
 #define SCHERM_RST 7
 #define LOG_PIN 41
-#define CELCIUS_CORRECTION -2
+#define CELCIUS_CORRECTION 0
 #define SS_PIN 53
 #define RESET_PIN 39
 const long baud = 115200;
@@ -35,7 +35,8 @@ void setup(){
 
 
   log_init();
-   log_println(F("Setup"));
+  log_println(F("Setup"));
+  
   knoppen_init();
   randomSeed(analogRead(2));
   pinMode(SD_KAART_PIN, OUTPUT);
@@ -61,7 +62,7 @@ void loop(){
   knoppen_loop();
   interface_loop();
 
-//  scherm_debug();
+  //scherm_debug();
 }
 
 void serialEvent() {

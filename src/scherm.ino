@@ -3,6 +3,8 @@ Adafruit_ILI9341 scherm = Adafruit_ILI9341(SCHERM_CS, SCHERM_DC, SCHERM_RST);
 
 bool scherm_changed = false;
 
+int scherm_curvraagnr = 0;
+
 inline void scherm_init() {
   pinMode(SCHERM_BL, OUTPUT);
   scherm_uit();
@@ -77,8 +79,6 @@ void scherm_draw_cijfer(int x, int y, int val){
 //  scherm.print(a[val]);
 }
 
-int scherm_curvraagnr = 0;
-
 void scherm_stel_vraag(){
 
   char vraagBuf[80];
@@ -99,6 +99,10 @@ void scherm_stel_vraag(){
   scherm.setCursor(5,45);
   scherm.print(F("werkruimte?")); 
   */ 
+}
+
+int scherm_get_curvraagnr(){
+  return scherm_curvraagnr;
 }
 
 void scherm_reset(){

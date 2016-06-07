@@ -1,12 +1,22 @@
 byte modus = 0; // 0 = inactief, 1 = vraag stellen, 2 = data opslaan, 3 = bedanken
 long modus_last_change;
 
-inline void interface_loop(){
+long last_question = 0;
+long seconden_tussen_vragen = 30;
 
-  if (modus==0){
+bool potmeter_has_changed = false;
+
+inline void interface_loop(){
+  bool shouldAsk = modus == 0;
+  shouldAsk = shouldAsk && (millis() - last_question > seconden_tussen_vragen * 1000);
+  shouldAsk = shouldAsk && (opslag_getBegintijd() < klok_getHour());
+  shouldAsk = shouldAsk && (opslag_getEindtijd() > klok_getHour());
+
+  if (shouldAsk){
     scherm_reset();
     scherm_stel_vraag();
     scherm_draw_cijfer(35, 90, -1);
+    potmeter_has_changed = false;
     scherm_aan();
     modus = 1;
   }
@@ -27,15 +37,24 @@ inline void interface_loop(){
     
     opslag_SaveData(time, timeString,temp,heatIndex,humidity, lichtKleur, lichtSterkte, CO2, geluid, antwoordNr);
 
-    modus_last_change = millis();
-    scherm_reset();
-    scherm_draw_bedankt(10,50);
-
-
-    modus=3;
+    if (scherm_get_curvraagnr() != 0){
+      scherm_reset();
+      scherm_stel_vraag();
+      scherm_draw_cijfer(35, 90, -1);
+      potmeter_has_changed = false;
+      scherm_aan();
+      modus=1;
+    } else {
+      modus_last_change = millis();
+      scherm_reset();
+      scherm_draw_bedankt(10,50);
+      modus=3;
+    }
   }
 
   if (modus==3 && millis() - modus_last_change > 5000){
+    last_question = millis();
+    
     modus=0;
     modus_last_change = millis();
     scherm_reset();
@@ -44,7 +63,7 @@ inline void interface_loop(){
 }
 
 void interface_selecteer_pressed(){
-  if (modus==1){
+  if (modus==1 && potmeter_has_changed){
     modus = 2;
   }
 }
@@ -53,6 +72,8 @@ void interface_potmeter_changed(int val) {
   if (modus!=1){
     return;
   }
+
+  potmeter_has_changed = true;
   
   scherm_draw_cijfer(35, 90, val);
 }

@@ -13,10 +13,6 @@ inline void sensor_temp_init()  {
   dht.begin();
 }
 
-void sensor_temp_loop() {
-
-}
-
 void sensor_temp_read_values() {
   humidity = dht.readHumidity();
   celcius = dht.readTemperature() + CELCIUS_CORRECTION;

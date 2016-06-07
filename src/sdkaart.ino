@@ -236,3 +236,41 @@ bool opslag_getAntwoord(int vraagnr, int antwoordnr, char* antwoordbuf) {
   return false;
 }
 
+int opslag_getBegintijd() {
+  if(!ini.open()) {
+    log_println("Configuratiebestand kon niet geopend worden, begintijd");
+    return -1;
+  }
+
+  char buf[80];
+  if(ini.getValue("tijden", "begintijd", buf, 80)) {
+    ini.close();
+    
+    return atoi(buf);
+  }
+  
+  ini.close();
+  log_println("antwoord wordt niet goed opgehaald");
+  return -1;
+}
+
+int opslag_getEindtijd() {
+  if(!ini.open()) {
+    log_println("Configuratiebestand kon niet geopend worden, eindtijd");
+    return -1;
+  }
+
+  char buf[80];
+  if(ini.getValue("tijden", "eindtijd", buf, 80)) {
+    ini.close();
+    
+    return atoi(buf);
+  }
+  
+  ini.close();
+  log_println("antwoord wordt niet goed opgehaald");
+  return -1;
+}
+
+
+
