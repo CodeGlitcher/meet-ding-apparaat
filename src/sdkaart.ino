@@ -21,9 +21,16 @@ IniFile ini = IniFile("ARDUINO/config.ini");
 */
 inline void opslag_init(){
   SdFile::dateTimeCallback(dateTime);
- 
+
+  int counter = 0;
   while (!SD.begin(SD_KAART_PIN)) {
     log_println(F("SD-kaart niet gevonden"));
+    counter++;
+    if(counter == 10){
+        log_println(F("Resetting arduino!"));
+        delay(50);
+        pinMode(RESET_PIN, OUTPUT);
+    }
     delay(500);
   }
   
@@ -124,7 +131,10 @@ void dateTime(uint16_t* date, uint16_t* time) {
 
 void opslag_sendData() {
   File file = SD.open(opslag_getDataFileLocation(), FILE_READ);
+
+  
   if (file) {
+    Serial.println(file.size());
     while (file.available()) {
       Serial.write(file.read());
     }
