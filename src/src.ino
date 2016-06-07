@@ -4,7 +4,8 @@
 #include "SD.h"
 #include "DHT.h"
 #include "Adafruit_GFX.h"
-#include "Adafruit_ST7735.h"
+//#include "Adafruit_ST7735.h"
+#include "Adafruit_ILI9341.h"
 #include "IniFile.h"
 //#include "Fonts/FreeSans18pt7b.h"
 
@@ -20,6 +21,7 @@
 #define SCHERM_BL 8
 #define SCHERM_DC 9
 #define SCHERM_CS 10
+#define SCHERM_RST 7
 #define LOG_PIN 41
 #define CELCIUS_CORRECTION -2
 #define SS_PIN 53

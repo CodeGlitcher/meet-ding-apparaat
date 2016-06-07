@@ -1,14 +1,15 @@
-//Adafruit_ILI9341 scherm = Adafruit_ILI9341(TFT_CS, TFT_DC);
-Adafruit_ST7735 scherm = Adafruit_ST7735(SCHERM_CS, SCHERM_DC);
+Adafruit_ILI9341 scherm = Adafruit_ILI9341(SCHERM_CS, SCHERM_DC, SCHERM_RST);
+//Adafruit_ST7735 scherm = Adafruit_ST7735(SCHERM_CS, SCHERM_DC);
 
 bool scherm_changed = false;
 
 inline void scherm_init() {
   pinMode(SCHERM_BL, OUTPUT);
   scherm_uit();
-  scherm.initR(INITR_BLACKTAB);
+//  scherm.initR(INITR_BLACKTAB);
+  scherm.begin();
   scherm.setRotation(1);
-  scherm.fillScreen(ST7735_BLACK);
+  scherm.fillScreen(ILI9341_BLACK);
 //  scherm.setFont(&FreeSans18pt7b);
 
 }
@@ -23,7 +24,7 @@ inline void scherm_aan() {
 }
 
 void scherm_draw_bedankt(int x, int y){
-  scherm.fillRect(x, y, 100, 40, ST7735_BLACK);
+  scherm.fillRect(x, y, 100, 40, ILI9341_BLACK);
   
   scherm.setTextSize(3);  
   scherm.setCursor(x,y);
@@ -37,22 +38,22 @@ void scherm_draw_cijfer(int x, int y, int val){
     scherm.setTextColor(0x666666);
     scherm.setCursor(10,y);
     scherm.print(F("Draai aan de knop"));
-    scherm.setTextColor(ST7735_WHITE);
+    scherm.setTextColor(ILI9341_WHITE);
 
     return;
   } 
 
   if (!scherm_changed){
-    scherm.fillRect(0, y, scherm.width(), 100, ST7735_BLACK);
+    scherm.fillRect(0, y, scherm.width(), 100, ILI9341_BLACK);
   }
   scherm_changed = true;
   char antwoord[80];
   if(opslag_getAntwoord(opslag_getVraagNr(), val, antwoord)) {
-    scherm.fillRect(0,y+16, scherm.width(), 18, ST7735_BLACK);
+    scherm.fillRect(0,y+16, scherm.width(), 18, ILI9341_BLACK);
     int length = strlen(antwoord);
-    scherm.fillRect(12*length, y, scherm.width(), 18, ST7735_BLACK);
+    scherm.fillRect(12*length, y, scherm.width(), 18, ILI9341_BLACK);
     scherm.setTextSize(2);    
-    scherm.setTextColor(ST7735_WHITE, ST7735_BLACK);
+    scherm.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
     scherm.setCursor(12,y);
     scherm.println(antwoord);
   } else {
@@ -101,7 +102,7 @@ void scherm_stel_vraag(){
 }
 
 void scherm_reset(){
-  scherm.fillScreen(ST7735_BLACK);
+  scherm.fillScreen(ILI9341_BLACK);
   scherm_changed = false;
 }
 
@@ -114,8 +115,8 @@ void scherm_debug(){
     sensor_temp_read_values();
     scherm.setTextSize(1);  
 
-    scherm.fillRect(0, 0, 32, 50, ST7735_BLACK);
-    scherm.drawRect(-1, -1, 33, 51, ST7735_RED);
+    scherm.fillRect(0, 0, 32, 50, ILI9341_BLACK);
+    scherm.drawRect(-1, -1, 33, 51, ILI9341_RED);
 
     scherm.setCursor(1, 1);
     scherm.println(analogRead(1));
