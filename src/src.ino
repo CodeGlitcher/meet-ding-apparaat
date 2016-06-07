@@ -21,7 +21,7 @@
 #define SCHERM_DC 9
 #define SCHERM_CS 10
 #define LOG_PIN 41
-#define CELCIUS_CORRECTION -2
+#define CELCIUS_CORRECTION 0
 
 const long baud = 38400;
 
@@ -40,11 +40,10 @@ void setup(){
   digitalWrite(SD_KAART_PIN, HIGH);
   digitalWrite(SCHERM_CS, HIGH);
 
- 
   opslag_init();
   klok_init();
   scherm_init();
-  //sensor_temp_init();
+  sensor_temp_init();
 
   knoppen_set_pot_callback(&interface_potmeter_changed);
   knoppen_set_selecteer_callback(&interface_selecteer_pressed);
@@ -56,7 +55,7 @@ void loop(){
   knoppen_loop();
   interface_loop();
 
-//  scherm_debug();
+  //scherm_debug();
 }
 
 void serialEvent() {
