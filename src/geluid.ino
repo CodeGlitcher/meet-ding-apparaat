@@ -1,8 +1,8 @@
 #define LOG_OUT 1 // use the log output function
 #define FFT_N 256 // set to 256 point fft
 
-#define FFTTIMES 5
-//aantal peaks == ftttimes
+//Hoe vaak uit te voeren
+#define FFTTIMES 10
 
 #include <FFT.h> // include the library
 
@@ -10,10 +10,11 @@ static int times_index = 0;
 static int fft_times = FFTTIMES;
 static bool fft_loop = false;
 
-static bool oncetest = true;
-static bool onceprint = true;
+static bool oncetest = true; //TEST
+static bool onceprint = true; //TEST
 
-float freq_peaks[FFTTIMES];
+double freq_out[FFTTIMES];
+double mag_out[FFTTIMES];
 
 void setup() {
   Serial.begin(115200); // use the serial port
@@ -52,52 +53,58 @@ void loop() {
         fft_mag_log(); // take the output of the fft
         sei();
     
-//        Debug FFT magnitude array    
+        //Debug FFT magnitude array    
 //        for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-//          Serial.println(fft_log_out[i]); // send out the data
+//          Serial.print(fft_log_out[i]); // send out the data
+//          Serial.print(" ");
 //        }
+//        Serial.println(" ");
     
-        float freq_array[FFT_N/2];
-        float hz_rate = 1440; //SAMPLING RATE ARDUINO UNO!
-        float max_freq = 0;
-        
-        //Magnitudes to frequencies
-        for (byte i = 0 ; i < FFT_N/2 ; i++) { 
-          
-          freq_array[i] = fft_log_out[i] * hz_rate / FFT_N;
-          
-          if(freq_array[i] > max_freq) {
-            //filter first two (artefacts?)
-            if(i >= 2) { max_freq = freq_array[i]; }
+        double hz_rate = 1440; //SAMPLING RATE ARDUINO UNO!
+        double max_mag = -1;
+        double max_mag_index = -1;
+
+        //skip eerste 3 magnitudes (artefacts?)
+        for (byte i = 3 ; i < FFT_N/2 ; i++) { 
+          if(fft_log_out[i] > max_mag) {
+            max_mag = fft_log_out[i];
+            max_mag_index = i;
           }
-          
-          Serial.print(freq_array[i]); 
-          Serial.print(" ");
         }
 
-        Serial.println("");
-//        Serial.print("MAX FREQ: ");
-//        Serial.print(max_freq); Serial.println(" ");
+        //TEST PRINT
+//        Serial.print("magnitude:  "); Serial.print(max_mag); Serial.println("");
+//        Serial.print("mag index: "); Serial.print(max_mag_index); Serial.println("");
+//        Serial.print("hz_rate: "); Serial.print(hz_rate); Serial.println("");
+//        Serial.print("FFT_N: "); Serial.print(FFT_N); Serial.println("");
 
-        freq_peaks[times_index] = max_freq;
-        
-//        Serial.println("");
-//        Serial.print(fft_times);
-//        Serial.println("");
-//        freq_peaks[fft_times] = freq_array[1];
+        mag_out[times_index] = max_mag;
+  
+        double wave_freq = max_mag_index * hz_rate / FFT_N;
+        freq_out[times_index] = wave_freq;
 
         fft_times--;
         times_index++;
     }
 
+    //TEST PRINT
      if(onceprint) { 
-       Serial.print("PRINT THING ");
-       
-      for (int i = 0 ; i < sizeof(freq_peaks)/sizeof(float) ; i++) { 
-        Serial.print(freq_peaks[i]);
+       Serial.println("MAGS");
+
+      for (int i = 0 ; i < sizeof(mag_out)/sizeof(double) ; i++) { 
+        Serial.print(mag_out[i]);
+        Serial.print(" ");
+      }
+      Serial.println("\nFREQS");
+ 
+      for (int i = 0 ; i < sizeof(freq_out)/sizeof(double) ; i++) { 
+        Serial.print(freq_out[i]);
         Serial.print(" ");
       }
       Serial.println("");
+
+
+      
       onceprint = false;
     }
   }
@@ -110,9 +117,5 @@ void do_fft_times() {
 }
 
 float get_peak(int index) {
-  return freq_peaks[index];
+  return freq_out[index];
 }
-
-
-
-
