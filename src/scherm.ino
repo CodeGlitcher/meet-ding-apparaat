@@ -2,90 +2,64 @@ Adafruit_ILI9341 scherm = Adafruit_ILI9341(SCHERM_CS, SCHERM_DC, SCHERM_RST);
 //Adafruit_ST7735 scherm = Adafruit_ST7735(SCHERM_CS, SCHERM_DC);
 
 bool scherm_changed = false;
-
 int scherm_curvraagnr = 0;
 
 inline void scherm_init() {
-  pinMode(SCHERM_BL, OUTPUT);
-  scherm_uit();
-//  scherm.initR(INITR_BLACKTAB);
   scherm.begin();
   scherm.setRotation(1);
   scherm.fillScreen(ILI9341_BLACK);
-//  scherm.setFont(&FreeSans18pt7b);
 
 }
 
-inline void scherm_uit() {
-    digitalWrite(SCHERM_BL, LOW);
-}
+//inline void scherm_uit() {
+//    digitalWrite(SCHERM_BL, LOW);
+//}
+//
+//inline void scherm_aan() {
+//    digitalWrite(SCHERM_BL, HIGH);  
+//}
 
-inline void scherm_aan() {
-    digitalWrite
-    (SCHERM_BL, HIGH);  
-}
 
-void scherm_draw_bedankt(int x, int y){
-  scherm.fillRect(x, y, 100, 40, ILI9341_BLACK);
-  
-  scherm.setTextSize(3);  
-  scherm.setCursor(x,y);
-  scherm.print(F("Bedankt!"));
-  scherm.setTextSize(1); 
-}
 
-void scherm_draw_cijfer(int x, int y, int val){
-  if (val==-1){
-    scherm.setTextSize(2);
-    scherm.setTextColor(0x666666);
-    scherm.setCursor(10,y);
-    scherm.print(F("Draai aan de knop"));
+void scherm_draw_cijfer(int antwoordnr){
+  if (antwoordnr==-1){
+    scherm.fillRect(0, 120, scherm.width(), 24*3, ILI9341_BLACK);
+    scherm.setTextSize(3);
     scherm.setTextColor(ILI9341_WHITE);
+    scherm.setCursor(0,120);
+    scherm.println(F("Draai aan de knop"));
+    delay(1);
 
     return;
   } 
 
   if (!scherm_changed){
-    scherm.fillRect(0, y, scherm.width(), 100, ILI9341_BLACK);
+    scherm.fillRect(0, 100, scherm.width(), 100, ILI9341_BLACK);
   }
   scherm_changed = true;
   char antwoord[80];
-  if(opslag_getAntwoord(opslag_getVraagNr(), val, antwoord)) {
-    scherm.fillRect(0,y+16, scherm.width(), 18, ILI9341_BLACK);
-    int length = strlen(antwoord);
-    scherm.fillRect(12*length, y, scherm.width(), 18, ILI9341_BLACK);
-    scherm.setTextSize(2);    
-    scherm.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-    scherm.setCursor(12,y);
-    scherm.println(antwoord);
-  } else {
-    log_println("Antwoord niet gevonden!");
+  scherm.setTextSize(3);
+  scherm.setCursor(0, 120);
+  for(int i = 0; i < 3; i++) {
+    scherm.fillRect(0, 120+(24*i), scherm.width(), 24, ILI9341_BLACK);
+    if(opslag_getAntwoord(opslag_getVraagNr(), antwoordnr, i, antwoord)) {
+      scherm.println(antwoord);
+    }
   }
-
-//  char a[7][12];
-//  strcpy(a[0], "Zeer slecht");
-//  strcpy(a[1], "  Slecht   ");
-//  strcpy(a[2], "   Matig   ");
-//  strcpy(a[3], " Voldoende ");
-//  strcpy(a[4], "  Redelijk ");
-//  strcpy(a[5], "   Goed    ");
-//  strcpy(a[6], " Zeer goed ");
-//
-//  int len = strlen(a[val]); 
-//  scherm.setTextSize(2);
-//  scherm.fillRect(12 + len * 12 , y, (11 - len) * 12, 24, ST7735_BLACK);
-//  scherm.setTextColor(ST7735_WHITE, ST7735_BLACK);
-//  scherm.setCursor(12,y);
-//  scherm.print(a[val]);
 }
 
 void scherm_stel_vraag(){
 
+  scherm.setTextSize(3);
+  scherm.setCursor(0,0);
+
+  scherm.fillRect(0,0, scherm.width(), 4*24, ILI9341_BLACK);
+
   char vraagBuf[80];
-  if(opslag_getVraag(scherm_curvraagnr, vraagBuf)) {
-    scherm.setTextSize(2);
-    scherm.setCursor(0,0);
-    scherm.println(vraagBuf);
+  for(int i = 0; i < 4; i++) {
+    if(opslag_getVraag(scherm_curvraagnr, i, vraagBuf)) {
+      scherm.println(vraagBuf);
+    }
   }
   scherm_curvraagnr = (scherm_curvraagnr + 1) % opslag_getVraagAantal(); 
 
@@ -99,6 +73,15 @@ void scherm_stel_vraag(){
   scherm.setCursor(5,45);
   scherm.print(F("werkruimte?")); 
   */ 
+}
+
+void scherm_draw_bedankt(int x, int y){
+  scherm.fillRect(0, 0, 320, 240, ILI9341_BLACK);
+  
+  scherm.setTextSize(4);  
+  scherm.setCursor(x,y);
+  scherm.print(F("Bedankt!"));
+  scherm.setTextSize(1); 
 }
 
 int scherm_get_curvraagnr(){

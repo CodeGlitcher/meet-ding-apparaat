@@ -2,22 +2,21 @@ byte modus = 0; // 0 = inactief, 1 = vraag stellen, 2 = data opslaan, 3 = bedank
 long modus_last_change;
 
 long last_question = 0;
-long seconden_tussen_vragen = 30;
 
 bool potmeter_has_changed = false;
 
 inline void interface_loop(){
   bool shouldAsk = modus == 0;
-  shouldAsk = shouldAsk && (millis() - last_question > seconden_tussen_vragen * 1000);
+  shouldAsk = shouldAsk && (millis() - last_question > opslag_getVraagInterval() * 1000);
   shouldAsk = shouldAsk && (opslag_getBegintijd() < klok_getHour());
   shouldAsk = shouldAsk && (opslag_getEindtijd() > klok_getHour());
-
+  
   if (shouldAsk){
     scherm_reset();
     scherm_stel_vraag();
-    scherm_draw_cijfer(35, 90, -1);
+    scherm_draw_cijfer(-1);
     potmeter_has_changed = false;
-    scherm_aan();
+//    scherm_aan();
     modus = 1;
   }
 
@@ -29,20 +28,19 @@ inline void interface_loop(){
     double temp = sensor_temp_celcius();
     double heatIndex = sensor_temp_heatindex_c();
     double humidity = sensor_temp_humidity();
-    int lichtKleur = 0;
     int lichtSterkte = analogRead(1);
     int CO2 = 0;
     int geluid = 0;
     int antwoordNr = knoppen_potmeter_waarde();
     
-    opslag_SaveData(time, timeString,temp,heatIndex,humidity, lichtKleur, lichtSterkte, CO2, geluid, antwoordNr);
+    opslag_SaveUserData(time, timeString,temp,heatIndex,humidity, lichtSterkte, CO2, geluid, antwoordNr);
 
     if (scherm_get_curvraagnr() != 0){
       scherm_reset();
       scherm_stel_vraag();
-      scherm_draw_cijfer(35, 90, -1);
+      scherm_draw_cijfer(-1);
       potmeter_has_changed = false;
-      scherm_aan();
+//      scherm_aan();
       modus=1;
     } else {
       modus_last_change = millis();
@@ -58,7 +56,7 @@ inline void interface_loop(){
     modus=0;
     modus_last_change = millis();
     scherm_reset();
-    scherm_uit();    
+//    scherm_uit();    
   }
 }
 
@@ -68,12 +66,12 @@ void interface_selecteer_pressed(){
   }
 }
 
-void interface_potmeter_changed(int val) {
+void interface_potmeter_changed(int antwoordnr) {
   if (modus!=1){
     return;
   }
 
   potmeter_has_changed = true;
   
-  scherm_draw_cijfer(35, 90, val);
+  scherm_draw_cijfer(antwoordnr);
 }

@@ -6,8 +6,10 @@ int opslag_antwoord_nr;
 
 int opslag_begintijd;
 int opslag_eindtijd;
+int opslag_vraaginterval = -1;
+int opslag_sensorinterval = -1;
 
-
+bool dagen[] = {false, false, false, false, false, false, false};
 
 // alles komt om een of andere rede in hoofdletters te staan. Hier ook maar.
 String dataFolder = "ARDUINO";
@@ -46,13 +48,14 @@ inline void opslag_init(){
     // check if file exist
     if (file) {
       // Headerrow
-      file.println(F("Tijd(ms),Datum,Temperatuur,Gevoelstemperatuur,Luchtvochtigheid,Lichtkleur,Lichtsterkte,CO2,Geluid,Vraagnummer,Vraag,Antwoordnummer,Antwoord"));
+      file.println(F("Type meting|Tijd(ms)|Datum|Temperatuur|Gevoelstemperatuur|Luchtvochtigheid|Lichtkleur|CO2|Geluid|Vraagnummer|Vraag|Antwoordnummer|Antwoord"));
       file.close();
     } else {
       log_println(F("Data bestand aanmaken mislukt"));
     }
   }
-  
+
+  // lees configuratiebestand uit
   if(ini.open()) {
     char retBuf[80];
     
@@ -60,15 +63,31 @@ inline void opslag_init(){
     opslag_aantal_vragen = 0;
     char buf[8];
     sprintf(buf, "vraag%d", 0);
-    while (ini.getValue(buf, "vraag", retBuf, 80)) {
+    while (ini.getValue(buf, "vraag_deel0", retBuf, 80)) {
       opslag_aantal_vragen++;
       sprintf(buf, "vraag%d", opslag_aantal_vragen);
     }
     
     //begin en eind tijden ophalen
-    if(!ini.getValue("tijden", "begintijd", retBuf, 80, opslag_begintijd) || !ini.getValue("tijden", "eindtijd", retBuf, 80, opslag_eindtijd)) {
+    if( !ini.getValue("tijden", "begintijd", retBuf, 80, opslag_begintijd) || 
+        !ini.getValue("tijden", "eindtijd", retBuf, 80, opslag_eindtijd) ||
+        !ini.getValue("tijden", "vraaginterval", retBuf, 80, opslag_vraaginterval) ||
+        !ini.getValue("tijden", "sensorinterval", retBuf, 80, opslag_sensorinterval)) {
+          
       log_println(F("Kan tijden niet inlezen"));
     }
+
+    //lees dagen in
+    if( !ini.getValue("dagen", "ma", retBuf, 80, dagen[0]) ||
+        !ini.getValue("dagen", "di", retBuf, 80, dagen[1]) ||
+        !ini.getValue("dagen", "wo", retBuf, 80, dagen[2]) ||
+        !ini.getValue("dagen", "do", retBuf, 80, dagen[3]) ||
+        !ini.getValue("dagen", "vr", retBuf, 80, dagen[4]) ||
+        !ini.getValue("dagen", "za", retBuf, 80, dagen[5]) ||
+        !ini.getValue("dagen", "zo", retBuf, 80, dagen[6])) {
+      log_println(F("Kan dagen niet inlezen"));
+    }
+    
     
     ini.close();
   } else {
@@ -77,9 +96,9 @@ inline void opslag_init(){
 }
 
 /**
-* Voeg data toe aan het data bestand.
+* Voeg data toe aan het data bestand. Het type wordt G van gebruiker
 */
-bool opslag_SaveData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtKleur, int lichtSterkte, int CO2, int geluid, int antwoordNr){
+bool opslag_SaveUserData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtSterkte, int CO2, int geluid, int antwoordNr){
   File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
   if (file) {
     
@@ -91,14 +110,73 @@ bool opslag_SaveData(long tijd, char* datum, float temp, float gevoelsTemp, floa
     dtostrf(gevoelsTemp,-4,2,gevoelsTempS);
     dtostrf(luchtvochtigheid,-4,2,luchtvochtigheidS);
 
-    char vraag[80];
-    char antwoord[80];
-    opslag_getVraag(opslag_vraag_nr, vraag);
-    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, antwoord);
-    Serial.println(antwoord);
+    char vraagBuf[18*4];
+    char vraagRgl[80];
+    for(int i = 0; i < 4; i++) {
+      if(opslag_getVraag(opslag_vraag_nr, i, vraagRgl)) {
+        sprintf(vraagBuf + strlen(vraagBuf), "%s ", vraagRgl);
+      }
+    }
+
+    char antwoordBuf[18*3];
+    char antwoordRgl[80];
+    for(int i = 0; i < 3; i++) {
+      if(opslag_getAntwoord(opslag_vraag_nr, antwoordNr, i, antwoordRgl)) {
+        sprintf(antwoordBuf + strlen(antwoordBuf), "%s ", antwoordRgl);
+      }
+    }
+
+//    char vraag0[80];
+//    char vraag1[80];
+//    char vraag2[80];
+//    char vraag3[80];
+//    char vraagBuf[18*4];
+//    opslag_getVraag(opslag_vraag_nr, 0, vraag0);
+//    opslag_getVraag(opslag_vraag_nr, 1, vraag1);
+//    opslag_getVraag(opslag_vraag_nr, 2, vraag2);
+//    opslag_getVraag(opslag_vraag_nr, 3, vraag3);
+//    sprintf(vraagBuf, "%s %s %s %s", vraag0, vraag1, vraag2, vraag3);
+    
+//    char antwoord0[80];
+//    char antwoord1[80];
+//    char antwoord2[80];
+//    char antwoordBuf[18*3];
+//    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, 0, antwoord0);
+//    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, 1, antwoord1);
+//    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, 2, antwoord2);
+//    sprintf(antwoordBuf, "%s %s %s", antwoord0, antwoord1, antwoord2);
+//    Serial.println(antwoordBuf);
     
     char buffer[200];
-    sprintf(buffer, "%ld,%s,%s,%s,%s,%d,%d,%d,%d,%d,%s,%d,%s", tijd, datum, tempS, gevoelsTempS, luchtvochtigheidS, lichtKleur, lichtSterkte, CO2, geluid, opslag_vraag_nr, vraag, antwoordNr, antwoord);
+    sprintf(buffer, "G|%ld|%s|%s|%s|%s|%d|%d|%d|%d|%s|%d|%s", tijd, datum, tempS, gevoelsTempS, luchtvochtigheidS, lichtSterkte, CO2, geluid, opslag_vraag_nr, vraagBuf, antwoordNr, antwoordBuf);
+    log_println(buffer);
+    file.println(buffer);
+    file.close();
+    
+    return true;
+  } else {
+    log_println(F("Data bestand openen mislukt"));
+    return false;
+  }
+}
+
+/*
+ * Sla data op van de sensoren. Het type is I van interval
+ */
+bool opslag_SaveIntervalData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtSterkte, int CO2, int geluid) {
+  File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
+  if (file) {
+    
+    char tempS[8];
+    char gevoelsTempS[8];
+    char luchtvochtigheidS[8];
+    
+    dtostrf(temp,-4,2,tempS);
+    dtostrf(gevoelsTemp,-4,2,gevoelsTempS);
+    dtostrf(luchtvochtigheid,-4,2,luchtvochtigheidS);
+    
+    char buffer[200];
+    sprintf(buffer, "I|%ld|%s|%s|%s|%s|%d|%d|%d||||", tijd, datum, tempS, gevoelsTempS, luchtvochtigheidS, lichtSterkte, CO2, geluid);
     log_println(buffer);
     file.println(buffer);
     file.close();
@@ -178,29 +256,34 @@ void opslag_recConfig() {
   }
 }
 
-bool opslag_getVraag(int vraagnr, char* retBuf) {
-  if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen) {
+bool opslag_getVraag(int vraagnr, int regelnr, char* retBuf) {
+  if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
+  regelnr < 0 || regelnr >= 4) {
     return false;
   }
-
+  
   //aantal antwoorden ophalen
   opslag_aantal_antwoorden = 0;
-  char antBuf[11];
-  char vrgBuf[8];
-  sprintf(antBuf, "antwoord%d", 0);
-  sprintf(vrgBuf, "vraag%d", vraagnr);
+  char keyBuf[18];
+  char secBuf[18];
+  sprintf(keyBuf, "antwoord%d_deel0", 0);
+  sprintf(secBuf, "vraag%d", vraagnr);
   
-  while (ini.getValue(vrgBuf, antBuf, retBuf, 80)) {
+  while (ini.getValue(secBuf, keyBuf, retBuf, 80)) {
     opslag_aantal_antwoorden++;
-    sprintf(antBuf, "antwoord%d", opslag_aantal_antwoorden);
+    sprintf(keyBuf, "antwoord%d_deel0", opslag_aantal_antwoorden);
   }
 
   //vraag ophalen
-  if(ini.getValue(vrgBuf, "vraag", retBuf, 80)){
+  sprintf(keyBuf, "vraag_deel%d", regelnr);
+  Serial.println(secBuf);
+  Serial.println(keyBuf);
+  if(ini.getValue(secBuf, keyBuf, retBuf, 80)){
     ini.close();
     opslag_vraag_nr = vraagnr;
     return true;
   }
+
   ini.close();
   return false;
 }
@@ -217,59 +300,40 @@ int opslag_getVraagNr() {
   return opslag_vraag_nr;
 }
 
-bool opslag_getAntwoord(int vraagnr, int antwoordnr, char* antwoordbuf) {
-  if(!ini.open() || antwoordnr < 0 || antwoordnr >= opslag_aantal_antwoorden) {
+bool opslag_getAntwoord(int vraagnr, int antwoordnr, int regelnr, char* antwoordbuf) {
+  if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
+  antwoordnr < 0 || antwoordnr >= opslag_aantal_antwoorden ||
+  regelnr < 0 || regelnr >= 3) {
     log_println("Er ging iets mis");
     return false;
   }
   
-  char antBuf[11];
-  char vrgBuf[8];
-  sprintf(vrgBuf, "vraag%d", vraagnr);
-  sprintf(antBuf, "antwoord%d", antwoordnr);
-  if(ini.getValue(vrgBuf, antBuf, antwoordbuf, 80)) {
+  char keyBuf[18];
+  char secBuf[18];
+  sprintf(secBuf, "vraag%d", vraagnr);
+  sprintf(keyBuf, "antwoord%d_deel%d", antwoordnr, regelnr);
+  if(ini.getValue(secBuf, keyBuf, antwoordbuf, 80)) {
     ini.close();
     return true;
   }
   ini.close();
-  log_println("antwoord wordt niet goed opgehaald");
   return false;
 }
 
 int opslag_getBegintijd() {
-  if(!ini.open()) {
-    log_println("Configuratiebestand kon niet geopend worden, begintijd");
-    return -1;
-  }
-
-  char buf[80];
-  if(ini.getValue("tijden", "begintijd", buf, 80)) {
-    ini.close();
-    
-    return atoi(buf);
-  }
-  
-  ini.close();
-  log_println("antwoord wordt niet goed opgehaald");
-  return -1;
+  return opslag_begintijd;
 }
 
 int opslag_getEindtijd() {
-  if(!ini.open()) {
-    log_println("Configuratiebestand kon niet geopend worden, eindtijd");
-    return -1;
-  }
+  return opslag_eindtijd;
+}
 
-  char buf[80];
-  if(ini.getValue("tijden", "eindtijd", buf, 80)) {
-    ini.close();
-    
-    return atoi(buf);
-  }
-  
-  ini.close();
-  log_println("antwoord wordt niet goed opgehaald");
-  return -1;
+int opslag_getVraagInterval() {
+  return opslag_vraaginterval;
+}
+
+int opslag_getSensorInterval() {
+  return opslag_sensorinterval;
 }
 
 

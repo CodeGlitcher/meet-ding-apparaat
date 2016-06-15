@@ -33,10 +33,10 @@ float sensor_temp_fahrenheit() {
 
 //Gevoelens tempratuur in celcius
 float sensor_temp_heatindex_c() {
-  return dht.computeHeatIndex(celcius, humidity);
+  return dht.computeHeatIndex(celcius, humidity, false);
 }
 
 //Fahrenheit == false
 float sensor_temp_heatindex_f() {
-  return dht.computeHeatIndex(fahrenheit, humidity, false);
+  return dht.computeHeatIndex(fahrenheit, humidity, true);
 }
