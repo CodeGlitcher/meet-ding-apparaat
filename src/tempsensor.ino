@@ -10,7 +10,9 @@ float humidity, celcius, fahrenheit = 0.0;
 long prev_millis = 0;
 
 inline void sensor_temp_init()  {
+  log_print(F("DHT sensor"));
   dht.begin();
+  log_println(F(" ... klaar"));
 }
 
 void sensor_temp_read_values() {

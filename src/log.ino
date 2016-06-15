@@ -19,6 +19,12 @@ void log_print(char* msg)
   }
 }
 
+void log_print(String msg) {
+  if (log_enabled) {
+    Serial.print(msg);
+  }
+}
+
 void log_println(char* msg)
 {
   if (log_enabled) {

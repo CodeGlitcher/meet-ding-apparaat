@@ -39,30 +39,24 @@ void setup(){
   digitalWrite(SCHERM_CS, HIGH);
   
   log_init();
-  log_print("Setup ");
+  log_println(F("Setup"));
   
   knoppen_init();
-  log_print(".");
   
   scherm_init();
-  log_print(".");
   
   opslag_init();
-  log_print(".");
   
   klok_init();
-  log_print(".");
   
   sensor_temp_init();
-  log_print(".");
   
   sensor_init();
-  log_print(".");
 
   knoppen_set_pot_callback(&interface_potmeter_changed);
   knoppen_set_selecteer_callback(&interface_selecteer_pressed);
 
-  log_print(" done");
+  log_println("Setup klaar");
 }
 
 void loop(){

@@ -5,9 +5,11 @@ bool scherm_changed = false;
 int scherm_curvraagnr = 0;
 
 inline void scherm_init() {
+  log_print(F("Scherm "));
   scherm.begin();
   scherm.setRotation(1);
   scherm.fillScreen(ILI9341_BLACK);
+  log_println(F("... klaar"));
 
 }
 

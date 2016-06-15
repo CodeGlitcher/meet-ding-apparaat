@@ -2,12 +2,12 @@ RTC_DS3231 rtc;
 
 void klok_init()
 {
-
+  log_print(F("Klok"));
   if (! rtc.begin()) {
-    log_println(F("Klok niet gevonden"));
+    log_println(F(" .. niet gevonden"));
     return;
   }
-  log_println(F("Klok gevonden"));
+  log_println(F(" ... klaar"));
   // use the following commands to set date and time
   // rtc.setDOW(TUESDAY);     // Set Day-of-Week to SUNDAY
   // rtc.setTime(10, 52, 0);     // Set the time to 12:00:00 (24hr format)
@@ -33,4 +33,9 @@ inline long klok_getUnixTime(){
 int klok_getHour() {
   return rtc.now().hour();
 }
+
+int klok_getDayOfWeek() {
+  return (rtc.now().dayOfTheWeek() - 1) % 7;
+}
+
 

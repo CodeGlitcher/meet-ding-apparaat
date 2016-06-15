@@ -8,7 +8,9 @@ void (*knoppen_pot_func)(int);
 
 inline void knoppen_init()
 {
+  log_print(F("Knoppen"));
   attachInterrupt(SELECTEER_PIN, knop_selecteer, FALLING);
+  log_println(" ... klaar");
 }
 
 void knoppen_set_selecteer_callback(void(*f)(void))

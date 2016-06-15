@@ -8,8 +8,10 @@ bool potmeter_has_changed = false;
 inline void interface_loop(){
   bool shouldAsk = modus == 0;
   shouldAsk = shouldAsk && (millis() - last_question > opslag_getVraagInterval() * 1000);
+  shouldAsk = shouldAsk && opslag_magOpDezeDag(klok_getDayOfWeek());
   shouldAsk = shouldAsk && (opslag_getBegintijd() < klok_getHour());
   shouldAsk = shouldAsk && (opslag_getEindtijd() > klok_getHour());
+  
   
   if (shouldAsk){
     scherm_reset();

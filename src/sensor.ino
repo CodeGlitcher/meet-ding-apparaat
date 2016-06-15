@@ -2,7 +2,9 @@ int interval;
 long lastRead = 0;
 
 void sensor_init() {
+  log_print(F("Sensoren"));
   interval = opslag_getSensorInterval() * 1000;
+  log_println(F(" ... klaar"));
 }
 
 void sensor_loop() {

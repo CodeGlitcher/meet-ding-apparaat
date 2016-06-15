@@ -9,6 +9,7 @@ int opslag_eindtijd;
 int opslag_vraaginterval = -1;
 int opslag_sensorinterval = -1;
 
+//                zo     ma     di     wo     do     vr     za
 bool dagen[] = {false, false, false, false, false, false, false};
 
 // alles komt om een of andere rede in hoofdletters te staan. Hier ook maar.
@@ -22,11 +23,12 @@ IniFile ini = IniFile("ARDUINO/config.ini");
 * This file contains logic for data storage
 */
 inline void opslag_init(){
+  log_print(F("SD kaart "));
   SdFile::dateTimeCallback(dateTime);
 
   int counter = 0;
   while (!SD.begin(SD_KAART_PIN)) {
-    log_println(F("SD-kaart niet gevonden"));
+    log_print(F(" ... niet gevonden"));
     counter++;
     if(counter == 10){
         log_println(F("Resetting arduino!"));
@@ -37,7 +39,7 @@ inline void opslag_init(){
   }
   
   if(!SD.exists(opslag_getDataFileLocation())){
-    log_println(F("Bestand bestaat niet"));
+    log_print(F(" ... csv aanmaken"));
     
     // maak folder
     SD.mkdir(dataFolder);
@@ -50,13 +52,18 @@ inline void opslag_init(){
       // Headerrow
       file.println(F("Type meting|Tijd(ms)|Datum|Temperatuur|Gevoelstemperatuur|Luchtvochtigheid|Lichtkleur|CO2|Geluid|Vraagnummer|Vraag|Antwoordnummer|Antwoord"));
       file.close();
+      log_print(F(" gelukt"));
     } else {
-      log_println(F("Data bestand aanmaken mislukt"));
+      log_print(F(" mislukt"));
     }
+  } else {
+    log_print(F(" ... csv aanwezig"));
   }
 
   // lees configuratiebestand uit
+  log_print(F(" ... config openen"));
   if(ini.open()) {
+    log_print(F(" gelukt"));
     char retBuf[80];
     
     //aantal vragen ophalen
@@ -67,32 +74,34 @@ inline void opslag_init(){
       opslag_aantal_vragen++;
       sprintf(buf, "vraag%d", opslag_aantal_vragen);
     }
-    
+        
     //begin en eind tijden ophalen
     if( !ini.getValue("tijden", "begintijd", retBuf, 80, opslag_begintijd) || 
         !ini.getValue("tijden", "eindtijd", retBuf, 80, opslag_eindtijd) ||
         !ini.getValue("tijden", "vraaginterval", retBuf, 80, opslag_vraaginterval) ||
         !ini.getValue("tijden", "sensorinterval", retBuf, 80, opslag_sensorinterval)) {
           
-      log_println(F("Kan tijden niet inlezen"));
+      log_print(F(" ... tijden inlezen mislukt"));
     }
 
     //lees dagen in
-    if( !ini.getValue("dagen", "ma", retBuf, 80, dagen[0]) ||
-        !ini.getValue("dagen", "di", retBuf, 80, dagen[1]) ||
-        !ini.getValue("dagen", "wo", retBuf, 80, dagen[2]) ||
-        !ini.getValue("dagen", "do", retBuf, 80, dagen[3]) ||
-        !ini.getValue("dagen", "vr", retBuf, 80, dagen[4]) ||
-        !ini.getValue("dagen", "za", retBuf, 80, dagen[5]) ||
-        !ini.getValue("dagen", "zo", retBuf, 80, dagen[6])) {
-      log_println(F("Kan dagen niet inlezen"));
-    }
-    
+    if( 
+        !ini.getValue("dagen", "zo", retBuf, 80, dagen[0]) ||
+        !ini.getValue("dagen", "ma", retBuf, 80, dagen[1]) ||
+        !ini.getValue("dagen", "di", retBuf, 80, dagen[2]) ||
+        !ini.getValue("dagen", "wo", retBuf, 80, dagen[3]) ||
+        !ini.getValue("dagen", "do", retBuf, 80, dagen[4]) ||
+        !ini.getValue("dagen", "vr", retBuf, 80, dagen[5]) ||
+        !ini.getValue("dagen", "za", retBuf, 80, dagen[6])
+        ) {
+      log_print(F(" ... dagen inlezen mislukt"));
+    }    
     
     ini.close();
   } else {
-    log_println(F("Config file niet aanwezig"));
+    log_print(F(" mislukt"));
   }
+  log_println(F(" ... klaar"));
 }
 
 /**
@@ -276,8 +285,6 @@ bool opslag_getVraag(int vraagnr, int regelnr, char* retBuf) {
 
   //vraag ophalen
   sprintf(keyBuf, "vraag_deel%d", regelnr);
-  Serial.println(secBuf);
-  Serial.println(keyBuf);
   if(ini.getValue(secBuf, keyBuf, retBuf, 80)){
     ini.close();
     opslag_vraag_nr = vraagnr;
@@ -318,6 +325,10 @@ bool opslag_getAntwoord(int vraagnr, int antwoordnr, int regelnr, char* antwoord
   }
   ini.close();
   return false;
+}
+
+bool opslag_magOpDezeDag(int dag) {
+  return dagen[dag];
 }
 
 int opslag_getBegintijd() {
