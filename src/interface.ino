@@ -2,6 +2,8 @@ byte modus = 0; // 0 = inactief, 1 = vraag stellen, 2 = data opslaan, 3 = bedank
 long modus_last_change;
 
 long last_question = 0;
+long question_asked = 0;
+
 
 bool potmeter_has_changed = false;
 
@@ -20,7 +22,16 @@ inline void interface_loop(){
     potmeter_has_changed = false;
 //    scherm_aan();
     modus = 1;
+    question_asked = millis();
   }
+
+  // check of er al 5 min lang een vraag wordt gesteld
+  if (modus == 1 && millis() - question_asked > (5 * 60 * 1000)) {
+    last_question = millis();
+    modus = 0;
+    scherm_reset();
+  }
+
 
   if (modus == 2){
     sensor_temp_read_values();
