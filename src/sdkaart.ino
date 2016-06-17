@@ -29,12 +29,6 @@ inline void opslag_init(){
   int counter = 0;
   while (!SD.begin(SD_KAART_PIN)) {
     log_print(F(" ... niet gevonden"));
-    counter++;
-    if(counter == 10){
-        log_println(F("Resetting arduino!"));
-        delay(50);
-        pinMode(RESET_PIN, OUTPUT);
-    }
     delay(500);
   }
   
@@ -134,27 +128,6 @@ bool opslag_SaveUserData(long tijd, char* datum, float temp, float gevoelsTemp, 
         sprintf(antwoordBuf + strlen(antwoordBuf), "%s ", antwoordRgl);
       }
     }
-
-//    char vraag0[80];
-//    char vraag1[80];
-//    char vraag2[80];
-//    char vraag3[80];
-//    char vraagBuf[18*4];
-//    opslag_getVraag(opslag_vraag_nr, 0, vraag0);
-//    opslag_getVraag(opslag_vraag_nr, 1, vraag1);
-//    opslag_getVraag(opslag_vraag_nr, 2, vraag2);
-//    opslag_getVraag(opslag_vraag_nr, 3, vraag3);
-//    sprintf(vraagBuf, "%s %s %s %s", vraag0, vraag1, vraag2, vraag3);
-    
-//    char antwoord0[80];
-//    char antwoord1[80];
-//    char antwoord2[80];
-//    char antwoordBuf[18*3];
-//    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, 0, antwoord0);
-//    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, 1, antwoord1);
-//    opslag_getAntwoord(opslag_vraag_nr, antwoordNr, 2, antwoord2);
-//    sprintf(antwoordBuf, "%s %s %s", antwoord0, antwoord1, antwoord2);
-//    Serial.println(antwoordBuf);
     
     char buffer[200];
     sprintf(buffer, "G|%ld|%s|%s|%s|%s|%d|%d|%d|%d|%s|%d|%s", tijd, datum, tempS, gevoelsTempS, luchtvochtigheidS, lichtSterkte, CO2, geluid, opslag_vraag_nr, vraagBuf, antwoordNr, antwoordBuf);
@@ -216,6 +189,68 @@ void dateTime(uint16_t* date, uint16_t* time) {
  *time = FAT_TIME(now.hour(), now.minute(), now.second());
 }
 
+bool opslag_getVraag(int vraagnr, int regelnr, char* retBuf) {
+  if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
+  regelnr < 0 || regelnr >= 4) {
+    return false;
+  }
+  
+  //aantal antwoorden ophalen
+  opslag_aantal_antwoorden = 0;
+  char keyBuf[18];
+  char secBuf[18];
+  sprintf(keyBuf, "antwoord%d_deel0", 0);
+  sprintf(secBuf, "vraag%d", vraagnr);
+  
+  while (ini.getValue(secBuf, keyBuf, retBuf, 80)) {
+    opslag_aantal_antwoorden++;
+    sprintf(keyBuf, "antwoord%d_deel0", opslag_aantal_antwoorden);
+  }
+
+  //vraag ophalen
+  sprintf(keyBuf, "vraag_deel%d", regelnr);
+  if(ini.getValue(secBuf, keyBuf, retBuf, 80)){
+    ini.close();
+    opslag_vraag_nr = vraagnr;
+    return true;
+  }
+
+  ini.close();
+  return false;
+}
+
+bool opslag_getAntwoord(int vraagnr, int antwoordnr, int regelnr, char* antwoordbuf) {
+  if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
+  antwoordnr < 0 || antwoordnr >= opslag_aantal_antwoorden ||
+  regelnr < 0 || regelnr >= 3) {
+    log_println("Er ging iets mis");
+    return false;
+  }
+  
+  char keyBuf[18];
+  char secBuf[18];
+  sprintf(secBuf, "vraag%d", vraagnr);
+  sprintf(keyBuf, "antwoord%d_deel%d", antwoordnr, regelnr);
+  if(ini.getValue(secBuf, keyBuf, antwoordbuf, 80)) {
+    ini.close();
+    return true;
+  }
+  ini.close();
+  return false;
+}
+
+int opslag_getAntwoordAantal() {
+  return opslag_aantal_antwoorden;
+}
+
+int opslag_getVraagAantal() {
+  return opslag_aantal_vragen;
+}
+
+int opslag_getVraagNr() {
+  return opslag_vraag_nr;
+}
+
 void opslag_sendData() {
   File file = SD.open(opslag_getDataFileLocation(), FILE_READ);
 
@@ -251,80 +286,34 @@ void opslag_recConfig() {
   }
   File file = SD.open(opslag_getConfigFileLocation(), FILE_WRITE);
   if(file) {
-    while(Serial.available()) {
-      char in = (char)Serial.read();
-      file.write(in);
-      Serial.write(in);
-      if(!Serial.available()) {
-        delay(5);
+    char in;
+    while(true) {
+      if(Serial.available()){
+        in = (char)Serial.read();
+        if( in == '$' ) {
+          break;
+        }
+        file.write(in);
       }
     }
+
+    
+//    char in;
+//    do {
+//      in = (char)Serial.read();
+//    } while (
+//    while(Serial.available()) {
+//      char in = (char)Serial.read();
+//      file.write(in);
+//      Serial.write(in);
+//      if(!Serial.available()) {
+//        delay(5);
+//      }
+//    }
     file.close();
   } else {
     log_println(F("Kan config file niet aanmaken"));
   }
-}
-
-bool opslag_getVraag(int vraagnr, int regelnr, char* retBuf) {
-  if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
-  regelnr < 0 || regelnr >= 4) {
-    return false;
-  }
-  
-  //aantal antwoorden ophalen
-  opslag_aantal_antwoorden = 0;
-  char keyBuf[18];
-  char secBuf[18];
-  sprintf(keyBuf, "antwoord%d_deel0", 0);
-  sprintf(secBuf, "vraag%d", vraagnr);
-  
-  while (ini.getValue(secBuf, keyBuf, retBuf, 80)) {
-    opslag_aantal_antwoorden++;
-    sprintf(keyBuf, "antwoord%d_deel0", opslag_aantal_antwoorden);
-  }
-
-  //vraag ophalen
-  sprintf(keyBuf, "vraag_deel%d", regelnr);
-  if(ini.getValue(secBuf, keyBuf, retBuf, 80)){
-    ini.close();
-    opslag_vraag_nr = vraagnr;
-    return true;
-  }
-
-  ini.close();
-  return false;
-}
-
-int opslag_getAntwoordAantal() {
-  return opslag_aantal_antwoorden;
-}
-
-int opslag_getVraagAantal() {
-  return opslag_aantal_vragen;
-}
-
-int opslag_getVraagNr() {
-  return opslag_vraag_nr;
-}
-
-bool opslag_getAntwoord(int vraagnr, int antwoordnr, int regelnr, char* antwoordbuf) {
-  if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
-  antwoordnr < 0 || antwoordnr >= opslag_aantal_antwoorden ||
-  regelnr < 0 || regelnr >= 3) {
-    log_println("Er ging iets mis");
-    return false;
-  }
-  
-  char keyBuf[18];
-  char secBuf[18];
-  sprintf(secBuf, "vraag%d", vraagnr);
-  sprintf(keyBuf, "antwoord%d_deel%d", antwoordnr, regelnr);
-  if(ini.getValue(secBuf, keyBuf, antwoordbuf, 80)) {
-    ini.close();
-    return true;
-  }
-  ini.close();
-  return false;
 }
 
 bool opslag_magOpDezeDag(int dag) {

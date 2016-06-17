@@ -25,15 +25,31 @@ inline void interface_loop(){
     question_asked = millis();
   }
 
+  
+
   // check of er al 5 min lang een vraag wordt gesteld
-  if (modus == 1 && millis() - question_asked > (5 * 60 * 1000)) {
-    last_question = millis();
-    modus = 0;
-    scherm_reset();
+  if (modus == 1) {
+    long dif = millis() - question_asked;
+    long minute = 60l*1000;
+    if (dif > 5 * minute) {                //als vraag langer dan 5 minuten gesteld wordt
+      last_question = millis();
+      modus = 0;
+      scherm_reset();
+      digitalWrite(WARNLED_PIN, LOW);
+    } else if (dif > 4*minute) {
+      digitalWrite(WARNLED_PIN, HIGH);
+    } else if (dif > 3*minute)  {
+      digitalWrite(WARNLED_PIN, (dif % 500 < 250));
+    } else if (dif > 2*minute) {
+      digitalWrite(WARNLED_PIN, (dif % 1000 < 500));
+    } else if (dif > minute) {
+      digitalWrite(WARNLED_PIN, (dif % 2000 < 1000));
+    }
   }
 
 
   if (modus == 2){
+    digitalWrite(WARNLED_PIN, LOW);
     sensor_temp_read_values();
     long  time = klok_getUnixTime();
     char timeString[17];
@@ -55,6 +71,7 @@ inline void interface_loop(){
       potmeter_has_changed = false;
 //      scherm_aan();
       modus=1;
+      question_asked = millis();
     } else {
       modus_last_change = millis();
       scherm_reset();

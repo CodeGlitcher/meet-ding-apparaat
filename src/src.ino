@@ -23,20 +23,21 @@
 #define SCHERM_CS 10
 #define SCHERM_RST 7
 
+#define WARNLED_PIN 8
+
 #define LOG_PIN 41
 #define CELCIUS_CORRECTION 0
-#define RESET_PIN 39
 const long baud = 115200;
 
 void setup(){  
-  pinMode(RESET_PIN, INPUT);
   pinMode(SD_KAART_PIN, OUTPUT);
   pinMode(SCHERM_CS, OUTPUT);
+  pinMode(WARNLED_PIN, OUTPUT);
   pinMode(LOG_PIN, INPUT);
   
-  digitalWrite(RESET_PIN, LOW);
   digitalWrite(SD_KAART_PIN, HIGH);
   digitalWrite(SCHERM_CS, HIGH);
+  digitalWrite(WARNLED_PIN, LOW);
   
   log_init();
   log_println(F("Setup"));
@@ -87,6 +88,9 @@ void serialEvent() {
           opslag_recConfig();
           break;
         case '4' :
+          //tijd
+          break;
+        case '5' :
           char en = (char)Serial.read();
           if(en == 't') {
             log_enable();
