@@ -8,6 +8,7 @@
 #define POTMETER_PIN A0
 // INTERRTUPT 0-1
 #define SELECTEER_PIN 0
+#define GELUID_PIN A1
 // DIGITAL 3-13
 #define DHTPIN 6
 #define BUZZER_PIN 3
