@@ -5,7 +5,7 @@ const int sampleWindow = 10000;
 unsigned int sample;
 
 //Som van alle peaks
-int peaksum = 0;
+unsigned int peaksum = 0;
 
 void geluid_setup() 
 {
@@ -43,10 +43,10 @@ private geluid_minmax() {
 }
 
 //Geluid aan de hand van aantal samples
-public geluid_samples_start(long samples) {
+public geluid_samples_start(unsigned long samples) {
 
-  int sampleAmount = samples; //lees samples
-  int sampleCount = 0; //counter
+  unsigned int sampleAmount = samples; //lees samples
+  unsigned int sampleCount = 0; //counter
 
   while(sampleCount < sampleAmount) {
     geluid_minmax();
@@ -55,9 +55,9 @@ public geluid_samples_start(long samples) {
 }
 
 //Geluid aan de hand van aantal millis
-public geluid_millis_start(long paramillis) {
+public geluid_millis_start(unsigned long paramillis) {
 
-  long endmillis = millis() + paramillis;
+  unsigned long endmillis = millis() + paramillis;
 
   while(millis() < endmillis) {
     geluid_minmax();
