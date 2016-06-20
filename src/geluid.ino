@@ -16,7 +16,7 @@ void geluid_loop()
 }
 
 private geluid_minmax() {
-  unsigned long startMillis = 0;  //Window
+  unsigned long startMillis = millis();  //Window
   unsigned int peakToPeak = 0;   //Min-max peak level
   unsigned int signalMax = 0;
   unsigned int signalMin = 1024;
