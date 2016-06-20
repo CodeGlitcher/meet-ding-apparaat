@@ -4,18 +4,21 @@
 const int sampleWindow = 10000; 
 unsigned int sample;
 
-//Som van alle peaks
-unsigned int peaksum = 0;
+unsigned int sampleAmount = 0; //max samples
+unsigned int sampleCount = 0; //samples count
+unsigned int peaksum = 0; //Som van alle peaks
 
-void geluid_setup() 
+bool bysamples = false;
+
+void setup() 
 {
 }
  
-void geluid_loop() 
+void loop() 
 { 
 }
 
-private geluid_minmax() {
+void geluid_minmax() {
   unsigned long startMillis = millis();  //Window
   unsigned int peakToPeak = 0;   //Min-max peak level
   unsigned int signalMax = 0;
@@ -40,24 +43,27 @@ private geluid_minmax() {
    // max - min = piek-piek amplitude
    peakToPeak = signalMax - signalMin;
    peaksum = peaksum + peakToPeak;
+   sampleCount++;
 }
 
 //Geluid aan de hand van aantal samples
-public geluid_samples_start(unsigned long samples) {
+void geluid_samples_start(unsigned long samples) {
 
-  unsigned int sampleAmount = samples; //lees samples
-  unsigned int sampleCount = 0; //counter
+  bysamples = true;
+  sampleAmount = samples; //lees samples
+  sampleCount = 0; //counter
 
   while(sampleCount < sampleAmount) {
     geluid_minmax();
-    sampleCount++;
   }
 }
 
 //Geluid aan de hand van aantal millis
-public geluid_millis_start(unsigned long paramillis) {
-
+void geluid_millis_start(unsigned long paramillis) {
+  
+  bysamples = false;
   unsigned long endmillis = millis() + paramillis;
+  sampleCount = 0;
 
   while(millis() < endmillis) {
     geluid_minmax();
@@ -66,7 +72,10 @@ public geluid_millis_start(unsigned long paramillis) {
 
 //Opvragen gemiddelde peaks
 int geluid_avg() {
-  return peaksum / sampleAmount;
+  if(bysamples) { //samples called before
+    return peaksum / sampleAmount;
+  } //millis called before
+  return peaksum / sampleCount;
 }
 
 
