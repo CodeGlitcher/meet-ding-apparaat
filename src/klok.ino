@@ -37,5 +37,20 @@ int klok_getHour() {
 int klok_getDayOfWeek() {
   return (rtc.now().dayOfTheWeek() - 1) % 7;
 }
-
+void readTime(){
+  String time ="";
+  char in;
+  while(true) {
+    if(Serial.available()){
+      in = (char)Serial.read();
+      if( in == '$' ) {
+        break;
+      }
+      time += in;
+    }
+  }
+  DateTime x = DateTime(time.toInt());
+  rtc.adjust(x);
+}
+ 
 

@@ -77,17 +77,21 @@ void serialEvent() {
       inChar = (char)Serial.read();
       switch(inChar) {
         case '0' :
+          sendSerialEnd(inChar);
           break;
         case '1' : 
           opslag_sendData();
+           sendSerialEnd(inChar);
           break;
         case '2' :
           opslag_sendConfig();
+           sendSerialEnd(inChar);
           break;
         case '3' :
           opslag_recConfig();
           break;
         case '4' :
+          readTime();
           //tijd
           break;
         case '5' :
@@ -97,13 +101,20 @@ void serialEvent() {
           } else if(en == 'f') {
             log_disable();
           }
+          sendSerialEnd(inChar);
           break;
       }
-      Serial.print('$');
-      Serial.print(inChar);
+  
     }
     while(Serial.available()) {
       Serial.read();
     }
   }
 }
+
+void sendSerialEnd(char in){
+      delay(2000);// give buffer some time co clear
+      Serial.print('$');
+      Serial.print(in);
+}
+
