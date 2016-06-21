@@ -316,6 +316,14 @@ void opslag_recConfig() {
   }
 }
 
+void opslag_verwijderData() {
+  if(SD.exists(opslag_getDataFileLocation())) {
+    if(!SD.remove(opslag_getDataFileLocation())) {
+      log_println(F("Kan config file niet verwijderen"));
+    }
+  }
+}
+
 bool opslag_magOpDezeDag(int dag) {
   return dagen[dag];
 }

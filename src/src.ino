@@ -85,7 +85,7 @@ void serialEvent() {
           break;
         case '2' :
           opslag_sendConfig();
-           sendSerialEnd(inChar);
+          sendSerialEnd(inChar);
           break;
         case '3' :
           opslag_recConfig();
@@ -101,6 +101,10 @@ void serialEvent() {
           } else if(en == 'f') {
             log_disable();
           }
+          sendSerialEnd(inChar);
+          break;
+        case '6' :
+          opslag_verwijderData();
           sendSerialEnd(inChar);
           break;
       }
