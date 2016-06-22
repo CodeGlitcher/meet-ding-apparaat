@@ -78,4 +78,8 @@ int geluid_avg() {
   return peaksum / sampleCount;
 }
 
+void setSampleWindow(unsigned int window) {
+  sampleWindow = window;
+}
+
 
