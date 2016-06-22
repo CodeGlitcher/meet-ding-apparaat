@@ -4,15 +4,14 @@
 #include "SD.h"
 #include "DHT.h"
 #include "Adafruit_GFX.h"
-//#include "Adafruit_ST7735.h"
 #include "Adafruit_ILI9341.h"
 #include "IniFile.h"
-//#include "Fonts/FreeSans18pt7b.h"
 
 #define DHTTYPE DHT22
 
 // ANALOG 0-5
 #define POTMETER_PIN A0
+#define CO2_PIN A2
 // INTERRTUPT 0-1
 #define SELECTEER_PIN 0
 // DIGITAL 3-13
@@ -51,6 +50,8 @@ void setup(){
   klok_init();
   
   sensor_temp_init();
+
+  sensor_co2_init();
   
   sensor_init();
 

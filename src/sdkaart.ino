@@ -28,7 +28,7 @@ inline void opslag_init(){
 
   int counter = 0;
   while (!SD.begin(SD_KAART_PIN)) {
-    log_print(F(" ... niet gevonden"));
+    log_print(F("."));
     delay(500);
   }
   

@@ -17,7 +17,7 @@ void sensor_loop() {
   }
   lastRead = millis();
 
-  int co2 = 0;                                  // CO2
+  int co2 = sensor_co2_ppm();                   // CO2
   int sound = 0;                                // geluid
   sensor_temp_read_values();                    // vertel dht22 om sensor uit te lezen
   double temp = sensor_temp_celcius();          // temperatuur

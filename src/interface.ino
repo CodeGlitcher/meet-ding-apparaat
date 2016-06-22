@@ -9,23 +9,19 @@ bool potmeter_has_changed = false;
 
 inline void interface_loop(){
   bool shouldAsk = modus == 0;
-  shouldAsk = shouldAsk && (millis() - last_question > opslag_getVraagInterval() * 1000);
+  shouldAsk = shouldAsk && (millis() - last_question > opslag_getVraagInterval() * 1000ul);
   shouldAsk = shouldAsk && opslag_magOpDezeDag(klok_getDayOfWeek());
   shouldAsk = shouldAsk && (opslag_getBegintijd() < klok_getHour());
-  shouldAsk = shouldAsk && (opslag_getEindtijd() > klok_getHour());
-  
+  shouldAsk = shouldAsk && (opslag_getEindtijd() > klok_getHour());  
   
   if (shouldAsk){
     scherm_reset();
     scherm_stel_vraag();
     scherm_draw_cijfer(-1);
     potmeter_has_changed = false;
-//    scherm_aan();
     modus = 1;
     question_asked = millis();
   }
-
-  
 
   // check of er al 5 min lang een vraag wordt gesteld
   if (modus == 1) {
@@ -46,7 +42,6 @@ inline void interface_loop(){
       digitalWrite(WARNLED_PIN, (dif % 2000 < 1000));
     }
   }
-
 
   if (modus == 2){
     digitalWrite(WARNLED_PIN, LOW);
@@ -69,7 +64,6 @@ inline void interface_loop(){
       scherm_stel_vraag();
       scherm_draw_cijfer(-1);
       potmeter_has_changed = false;
-//      scherm_aan();
       modus=1;
       question_asked = millis();
     } else {
@@ -85,8 +79,7 @@ inline void interface_loop(){
     
     modus=0;
     modus_last_change = millis();
-    scherm_reset();
-//    scherm_uit();    
+    scherm_reset();   
   }
 }
 
