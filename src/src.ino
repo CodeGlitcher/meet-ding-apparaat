@@ -95,12 +95,7 @@ void serialEvent() {
           //tijd
           break;
         case '5' :
-          char en = (char)Serial.read();
-          if(en == 't') {
-            log_enable();
-          } else if(en == 'f') {
-            log_disable();
-          }
+          setDebug();
           sendSerialEnd(inChar);
           break;
         case '6' :
@@ -114,6 +109,15 @@ void serialEvent() {
       Serial.read();
     }
   }
+}
+
+void setDebug(){
+   char en = (char)Serial.read();
+    if(en == 't') {
+      log_enable();
+    } else if(en == 'f') {
+      log_disable();
+    }
 }
 
 void sendSerialEnd(char in){
