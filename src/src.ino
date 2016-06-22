@@ -11,7 +11,9 @@
 
 // ANALOG 0-5
 #define POTMETER_PIN A0
+#define LDR_PIN A1
 #define CO2_PIN A2
+#define GELUID_PIN A3
 // INTERRTUPT 0-1
 #define SELECTEER_PIN 0
 // DIGITAL 3-13
@@ -65,6 +67,7 @@ void loop(){
   knoppen_loop();
   interface_loop();
   sensor_loop();
+  geluid_loop();
 
   //scherm_debug();
 }
