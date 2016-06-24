@@ -1,29 +1,23 @@
+// Deze module tekent op het scherm.
+// sch -> scherm
+
 Adafruit_ILI9341 scherm = Adafruit_ILI9341(SCHERM_CS, SCHERM_DC, SCHERM_RST);
-//Adafruit_ST7735 scherm = Adafruit_ST7735(SCHERM_CS, SCHERM_DC);
 
-bool scherm_changed = false;
-int scherm_curvraagnr = 0;
+bool sch_changed = false;
+int sch_curvraagnr = 0;
 
-inline void scherm_init() {
+// Zet het scherm klaar om te gaan beginnen
+inline void sch_init() {
   log_print(F("Scherm "));
   scherm.begin();
   scherm.setRotation(1);
   scherm.fillScreen(ILI9341_BLACK);
   log_println(F("... klaar"));
-
 }
 
-//inline void scherm_uit() {
-//    digitalWrite(SCHERM_BL, LOW);
-//}
-//
-//inline void scherm_aan() {
-//    digitalWrite(SCHERM_BL, HIGH);  
-//}
 
-
-
-void scherm_draw_cijfer(int antwoordnr){
+// Teken een cijfer
+void sch_drawCijfer(int antwoordnr){
   if (antwoordnr==-1){
     scherm.fillRect(0, 120, scherm.width(), 24*3, ILI9341_BLACK);
     scherm.setTextSize(3);
@@ -35,23 +29,23 @@ void scherm_draw_cijfer(int antwoordnr){
     return;
   } 
 
-  if (!scherm_changed){
+  if (!sch_changed){
     scherm.fillRect(0, 100, scherm.width(), 100, ILI9341_BLACK);
   }
-  scherm_changed = true;
+  sch_changed = true;
   char antwoord[80];
   scherm.setTextSize(3);
   scherm.setCursor(0, 120);
   for(int i = 0; i < 3; i++) {
     scherm.fillRect(0, 120+(24*i), scherm.width(), 24, ILI9341_BLACK);
-    if(opslag_getAntwoord(opslag_getVraagNr(), antwoordnr, i, antwoord)) {
+    if(ops_getAntwoord(ops_getVraagNr(), antwoordnr, i, antwoord)) {
       scherm.println(antwoord);
     }
   }
 }
 
-void scherm_stel_vraag(){
-
+// Lees de vraag van de sd en geef hem weer op het scherm
+void sch_stelVraag(){
   scherm.setTextSize(3);
   scherm.setCursor(0,0);
 
@@ -59,25 +53,14 @@ void scherm_stel_vraag(){
 
   char vraagBuf[80];
   for(int i = 0; i < 4; i++) {
-    if(opslag_getVraag(scherm_curvraagnr, i, vraagBuf)) {
+    if(ops_getVraag(sch_curvraagnr, i, vraagBuf)) {
       scherm.println(vraagBuf);
     }
   }
-  scherm_curvraagnr = (scherm_curvraagnr + 1) % opslag_getVraagAantal(); 
-
-  
-  /*
-  scherm.setTextSize(2);
-  scherm.setCursor(5,5);
-  scherm.print(F("Welk cijfer"));
-  scherm.setCursor(5,25);
-  scherm.print(F("geeft u deze"));
-  scherm.setCursor(5,45);
-  scherm.print(F("werkruimte?")); 
-  */ 
+  sch_curvraagnr = (sch_curvraagnr + 1) % ops_getVraagAantal(); 
 }
 
-void scherm_draw_bedankt(int x, int y){
+void sch_drawBedankt(int x, int y){
   scherm.fillRect(0, 0, 320, 240, ILI9341_BLACK);
   
   scherm.setTextSize(4);  
@@ -86,22 +69,22 @@ void scherm_draw_bedankt(int x, int y){
   scherm.setTextSize(1); 
 }
 
-int scherm_get_curvraagnr(){
-  return scherm_curvraagnr;
+int sch_getCurVraagNr(){
+  return sch_curvraagnr;
 }
 
-void scherm_reset(){
+void sch_reset(){
   scherm.fillScreen(ILI9341_BLACK);
-  scherm_changed = false;
+  sch_changed = false;
 }
 
-long scherm_last_debug = 0;
-void scherm_debug(){
+long sch_last_debug = 0;
+void sch_debug(){
 
-  if (millis() - scherm_last_debug > 1000){
-    scherm_last_debug = millis();
+  if (millis() - sch_last_debug > 1000){
+    sch_last_debug = millis();
 
-    sensor_temp_read_values();
+    tem_readValues();
     scherm.setTextSize(1);  
 
     scherm.fillRect(0, 0, 32, 50, ILI9341_BLACK);
@@ -110,8 +93,8 @@ void scherm_debug(){
     scherm.setCursor(1, 1);
     scherm.println(analogRead(1));
     scherm.setCursor(1, 11);
-    scherm.println(sensor_temp_humidity());
+    scherm.println(tem_humidity());
     scherm.setCursor(1, 21);
-    scherm.println(sensor_temp_celcius());
+    scherm.println(tem_celcius());
   }
 }

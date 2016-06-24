@@ -1,6 +1,12 @@
+// Deze module regelt de communicatie met de klok.
+// Door de klok (RTC) blijft de tijde gelijk lopen met
+// de werkelijke tijd. Ook als de klimaatscanner uit is geweest
+// klk -> klok
+
 RTC_DS3231 rtc;
 
-void klok_init()
+// Initialisatie van de klok
+void klk_init()
 {
   log_print(F("Klok"));
   if (! rtc.begin()) {
@@ -8,35 +14,30 @@ void klok_init()
     return;
   }
   log_println(F(" ... klaar"));
-  // use the following commands to set date and time
-  // rtc.setDOW(TUESDAY);     // Set Day-of-Week to SUNDAY
-  // rtc.setTime(10, 52, 0);     // Set the time to 12:00:00 (24hr format)
-  // rtc.setDate(26, 4, 2016);   // Set the date to January 1st, 2014
 }
 
-/**
-* Get date time sting.
-* 26-4-2016 -- 12:00
-*/
-inline void klok_getDateTime(char *buffer){
+//Vult de buffer met de tijd als string.
+inline void klk_getDateTime(char *buffer){
   DateTime now = rtc.now();
   sprintf(buffer, "%04d-%02d-%02d %02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute());
 }
-/**
-* Get unix time stemp
-*/
-inline long klok_getUnixTime(){
+
+//Geeft unix time stemp
+inline long klk_getUnixTime(){
   DateTime now = rtc.now();
   return now.unixtime();
 }
 
-int klok_getHour() {
+// Geeft het huidige uur
+int klk_getHour() {
   return rtc.now().hour();
 }
 
-int klok_getDayOfWeek() {
+// Geeft de huidige dag
+int klk_getDayOfWeek() {
   return (rtc.now().dayOfTheWeek() - 1) % 7;
 }
+
 void readTime(){
   String time ="";
   char in;

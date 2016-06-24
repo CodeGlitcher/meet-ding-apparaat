@@ -1,3 +1,6 @@
+// Deze module regelt de communicatie met de SD kaart
+// ops -> opslag
+
 int opslag_pin;
 int opslag_aantal_antwoorden;
 int opslag_aantal_vragen;
@@ -22,7 +25,7 @@ IniFile ini = IniFile("ARDUINO/config.ini");
 /**
 * This file contains logic for data storage
 */
-inline void opslag_init(){
+inline void ops_init(){
   log_print(F("SD kaart "));
   SdFile::dateTimeCallback(dateTime);
 
@@ -32,14 +35,14 @@ inline void opslag_init(){
     delay(500);
   }
   
-  if(!SD.exists(opslag_getDataFileLocation())){
+  if(!SD.exists(ops_getDataFileLocation())){
     log_print(F(" ... csv aanmaken"));
     
     // maak folder
     SD.mkdir(dataFolder);
     
     // open data file
-    File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
+    File file = SD.open(ops_getDataFileLocation(), FILE_WRITE);
   
     // check if file exist
     if (file) {
@@ -101,8 +104,8 @@ inline void opslag_init(){
 /**
 * Voeg data toe aan het data bestand. Het type wordt G van gebruiker
 */
-bool opslag_SaveUserData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtSterkte, int CO2, int geluid, int antwoordNr){
-  File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
+bool ops_saveUserData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtSterkte, int CO2, int geluid, int antwoordNr){
+  File file = SD.open(ops_getDataFileLocation(), FILE_WRITE);
   if (file) {
     
     char tempS[8];
@@ -116,7 +119,7 @@ bool opslag_SaveUserData(long tijd, char* datum, float temp, float gevoelsTemp, 
     char vraagBuf[18*4];
     char vraagRgl[80];
     for(int i = 0; i < 4; i++) {
-      if(opslag_getVraag(opslag_vraag_nr, i, vraagRgl)) {
+      if(ops_getVraag(opslag_vraag_nr, i, vraagRgl)) {
         sprintf(vraagBuf + strlen(vraagBuf), "%s ", vraagRgl);
       }
     }
@@ -124,7 +127,7 @@ bool opslag_SaveUserData(long tijd, char* datum, float temp, float gevoelsTemp, 
     char antwoordBuf[18*3];
     char antwoordRgl[80];
     for(int i = 0; i < 3; i++) {
-      if(opslag_getAntwoord(opslag_vraag_nr, antwoordNr, i, antwoordRgl)) {
+      if(ops_getAntwoord(opslag_vraag_nr, antwoordNr, i, antwoordRgl)) {
         sprintf(antwoordBuf + strlen(antwoordBuf), "%s ", antwoordRgl);
       }
     }
@@ -145,8 +148,8 @@ bool opslag_SaveUserData(long tijd, char* datum, float temp, float gevoelsTemp, 
 /*
  * Sla data op van de sensoren. Het type is I van interval
  */
-bool opslag_SaveIntervalData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtSterkte, int CO2, int geluid) {
-  File file = SD.open(opslag_getDataFileLocation(), FILE_WRITE);
+bool ops_saveIntervalData(long tijd, char* datum, float temp, float gevoelsTemp, float luchtvochtigheid, int lichtSterkte, int CO2, int geluid) {
+  File file = SD.open(ops_getDataFileLocation(), FILE_WRITE);
   if (file) {
     
     char tempS[8];
@@ -170,11 +173,11 @@ bool opslag_SaveIntervalData(long tijd, char* datum, float temp, float gevoelsTe
   }
 }
 
-String opslag_getDataFileLocation(){
+String ops_getDataFileLocation(){
   return dataFolder + '/' + dataFile;
 }
 
-String opslag_getConfigFileLocation(){
+String ops_getConfigFileLocation(){
   return dataFolder + '/' + configFile;
 }
 
@@ -189,7 +192,7 @@ void dateTime(uint16_t* date, uint16_t* time) {
  *time = FAT_TIME(now.hour(), now.minute(), now.second());
 }
 
-bool opslag_getVraag(int vraagnr, int regelnr, char* retBuf) {
+bool ops_getVraag(int vraagnr, int regelnr, char* retBuf) {
   if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
   regelnr < 0 || regelnr >= 4) {
     return false;
@@ -219,7 +222,7 @@ bool opslag_getVraag(int vraagnr, int regelnr, char* retBuf) {
   return false;
 }
 
-bool opslag_getAntwoord(int vraagnr, int antwoordnr, int regelnr, char* antwoordbuf) {
+bool ops_getAntwoord(int vraagnr, int antwoordnr, int regelnr, char* antwoordbuf) {
   if(!ini.open() || vraagnr < 0 || vraagnr >= opslag_aantal_vragen || 
   antwoordnr < 0 || antwoordnr >= opslag_aantal_antwoorden ||
   regelnr < 0 || regelnr >= 3) {
@@ -239,20 +242,20 @@ bool opslag_getAntwoord(int vraagnr, int antwoordnr, int regelnr, char* antwoord
   return false;
 }
 
-int opslag_getAntwoordAantal() {
+int ops_getAntwoordAantal() {
   return opslag_aantal_antwoorden;
 }
 
-int opslag_getVraagAantal() {
+int ops_getVraagAantal() {
   return opslag_aantal_vragen;
 }
 
-int opslag_getVraagNr() {
+int ops_getVraagNr() {
   return opslag_vraag_nr;
 }
 
-void opslag_sendData() {
-  File file = SD.open(opslag_getDataFileLocation(), FILE_READ);
+void ops_sendData() {
+  File file = SD.open(ops_getDataFileLocation(), FILE_READ);
 
   
   if (file) {
@@ -266,8 +269,8 @@ void opslag_sendData() {
   }
 }
 
-void opslag_sendConfig() {
-  File file = SD.open(opslag_getConfigFileLocation(), FILE_READ);
+void ops_sendConfig() {
+  File file = SD.open(ops_getConfigFileLocation(), FILE_READ);
   if (file) {
     while (file.available()) {
       Serial.write(file.read());
@@ -278,13 +281,13 @@ void opslag_sendConfig() {
   }
 }
 
-void opslag_recConfig() {
-  if(SD.exists(opslag_getConfigFileLocation())) {
-    if(!SD.remove(opslag_getConfigFileLocation())) {
+void ops_recConfig() {
+  if(SD.exists(ops_getConfigFileLocation())) {
+    if(!SD.remove(ops_getConfigFileLocation())) {
       log_println(F("Kan config file niet verwijderen"));
     }
   }
-  File file = SD.open(opslag_getConfigFileLocation(), FILE_WRITE);
+  File file = SD.open(ops_getConfigFileLocation(), FILE_WRITE);
   if(file) {
     char in;
     while(true) {
@@ -297,50 +300,37 @@ void opslag_recConfig() {
       }
     }
 
-    
-//    char in;
-//    do {
-//      in = (char)Serial.read();
-//    } while (
-//    while(Serial.available()) {
-//      char in = (char)Serial.read();
-//      file.write(in);
-//      Serial.write(in);
-//      if(!Serial.available()) {
-//        delay(5);
-//      }
-//    }
     file.close();
   } else {
     log_println(F("Kan config file niet aanmaken"));
   }
 }
 
-void opslag_verwijderData() {
-  if(SD.exists(opslag_getDataFileLocation())) {
-    if(!SD.remove(opslag_getDataFileLocation())) {
+void ops_verwijderData() {
+  if(SD.exists(ops_getDataFileLocation())) {
+    if(!SD.remove(ops_getDataFileLocation())) {
       log_println(F("Kan data file niet verwijderen"));
     }
   }
 }
 
-bool opslag_magOpDezeDag(int dag) {
+bool ops_magOpDezeDag(int dag) {
   return dagen[dag];
 }
 
-int opslag_getBegintijd() {
+int ops_getBegintijd() {
   return opslag_begintijd;
 }
 
-int opslag_getEindtijd() {
+int ops_getEindtijd() {
   return opslag_eindtijd;
 }
 
-int opslag_getVraagInterval() {
+int ops_getVraagInterval() {
   return opslag_vraaginterval;
 }
 
-int opslag_getSensorInterval() {
+int ops_getSensorInterval() {
   return opslag_sensorinterval;
 }
 

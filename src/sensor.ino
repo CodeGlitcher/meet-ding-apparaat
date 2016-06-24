@@ -1,35 +1,34 @@
+// Deze module zorgt dat er elk x-aantal seconden een meting wordt opgeslagen
+// sns -> sensor
+
 int interval;
 long lastRead = 0;
 
-void sensor_init() {
+void sns_init() {
   log_print(F("Sensoren"));
-  interval = opslag_getSensorInterval() * 1000;
+  interval = ops_getSensorInterval() * 1000;
   log_println(F(" ... klaar"));
 }
 
-void sensor_loop() {
+void sns_loop() {
   //bekijk of interval voorbij is
-//  Serial.println(millis() - lastRead);
-//  Serial.print("Interval: ");
-//  Serial.println(interval);
-  if(interval <= 0 || (millis() - lastRead < interval) || (opslag_getBegintijd() > klok_getHour() && klok_getHour() > opslag_getEindtijd())) {
+  if(interval <= 0 || (millis() - lastRead < interval) || (ops_getBegintijd() > klk_getHour() && klk_getHour() > ops_getEindtijd())) {
     return;
   }
   lastRead = millis();
 
-  int co2 = sensor_co2_ppm();                   // CO2
-
-  int sound = geluid_avg();                     // geluid
-  sensor_temp_read_values();                    // vertel dht22 om sensor uit te lezen
-  double temp = sensor_temp_celcius();          // temperatuur
-  double humidity = sensor_temp_humidity();     // luchtvochtigheid
-  double heatIndex = sensor_temp_heatindex_c(); // bepaal gevoelstemperatuur
-  int lichtSterkte = analogRead(1);             // lichtintensiteit
-  long timestamp = klok_getUnixTime();          // timestamp
+  tem_readValues();                    // vertel dht22 om sensor uit te lezen
+  int co2 = analogRead(CO2_PIN);                // CO2
+  int sound = gld_avg();                        // geluid
+  double temp = tem_celcius();          // temperatuur
+  double humidity = tem_humidity();     // luchtvochtigheid
+  double heatIndex = tem_heatIndexC(); // bepaal gevoelstemperatuur
+  int lichtSterkte = analogRead(LDR_PIN);       // lichtintensiteit
+  long timestamp = klk_getUnixTime();           // timestamp
   char timeString[17];                          
-  klok_getDateTime(timeString);                 // leesbare tijd
+  klk_getDateTime(timeString);                  // leesbare tijd
   
   //sla op in bestand
-  opslag_SaveIntervalData(timestamp, timeString, temp, heatIndex, humidity, lichtSterkte, co2, sound);
+  ops_saveIntervalData(timestamp, timeString, temp, heatIndex, humidity, lichtSterkte, co2, sound);
 }
 

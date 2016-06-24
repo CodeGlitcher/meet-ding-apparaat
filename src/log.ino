@@ -1,3 +1,7 @@
+// Deze module zorgt er voor dat het loggen van berichten uitgezet kan worden.
+// Dit willen we zodat de logs niet tussen de data belandt die overgezet wordt
+// naar een pc via serial.
+
 bool log_enabled = true;
 
 inline void log_init()
@@ -8,8 +12,10 @@ inline void log_init()
    log_disable();
   }
 
-  
   Serial.begin(baud, SERIAL_8N1);
+
+  
+  log_println(F("Log initialized"));
 }
 
 void log_print(char* msg)
