@@ -40,8 +40,8 @@ int sensor_co2_ppm() {
     float *pcurve = CO2Curve;
     int ppm = pow(10, (volts - pcurve[1]) / pcurve[2] + pcurve[0]);
     prevppm = ppm;
-    return ppm;
     volts = 0;
+    return ppm;
   }
 }
 
