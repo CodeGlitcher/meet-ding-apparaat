@@ -12,7 +12,7 @@ void sensor_loop() {
 //  Serial.println(millis() - lastRead);
 //  Serial.print("Interval: ");
 //  Serial.println(interval);
-  if(interval <= 0 || (millis() - lastRead < interval) || (opslag_getBegintijd() > klok_getHour() && klok_getHour() > opslag_getEindtijd())) {
+  if(interval <= 0 || (millis() - lastRead < interval) || (opslag_getBegintijd() > klok_getHour() && klok_getHour() >= opslag_getEindtijd())) {
     return;
   }
   lastRead = millis();
