@@ -8,6 +8,7 @@
 
 float CO2Curve[3] = {ZERO_POINT_X, ZERO_POINT_VOLTAGE, (REACTION_VOLTAGE / (2.602 - 4))};
 int percentage;
+int prevppm;
 
 void sensor_co2_init() {
   Serial.print("Co2(MG-811) Init\n");
@@ -29,10 +30,17 @@ int sensor_co2_ppm() {
 
   float volts = v / DC_GAIN;
   if (volts > ZERO_POINT_VOLTAGE || MAX_POINT_VOLTAGE < 0.265 ) {
-    return -1;
+    if(prevppm < 1000) {
+      return 400;
+    }
+    else {
+      return 9999;    
+    }
   } else {
     float *pcurve = CO2Curve;
-    return pow(10, (volts - pcurve[1]) / pcurve[2] + pcurve[0]);
+    int ppm = pow(10, (volts - pcurve[1]) / pcurve[2] + pcurve[0]);
+    prevppm = ppm;
+    return ppm;
     volts = 0;
   }
 }
